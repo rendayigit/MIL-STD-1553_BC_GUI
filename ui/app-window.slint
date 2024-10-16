@@ -1,4 +1,4 @@
-import { Button, CheckBox, ComboBox, TextEdit } from "std-widgets.slint";
+import { Button, CheckBox, ComboBox, TextEdit, Palette } from "std-widgets.slint";
 import { Rt-Sa-Wc-ComboBox } from "rt-sa-wc.slint";
 import { Word-Box } from "word-box.slint";
 
@@ -10,14 +10,18 @@ export global guiGlobals {
 }
 
 export component AppWindow inherits Window {
-    min-width: 600px;
-    preferred-width: 600px;
+    min-width: 700px;
+    preferred-width: 700px;
 
     min-height: 400px;
     preferred-height: 400px;
 
     property <int> commandType: 0; // Bc->RT: 0, RT->BC:1, RT->RT:2
     callback sendPressed(int);
+
+    init => {
+        Palette.color-scheme = ColorScheme.dark;
+    }
 
     VerticalLayout {
         HorizontalLayout {
@@ -77,7 +81,7 @@ export component AppWindow inherits Window {
             }
 
             Text {
-                text: "RT: ";
+                text: "  RT: ";
                 font-size: 30px;
                 vertical-alignment: center;
                 horizontal-alignment: center;
@@ -90,7 +94,7 @@ export component AppWindow inherits Window {
             }
 
             Text {
-                text: "SA: ";
+                text: "  SA: ";
                 font-size: 30px;
                 vertical-alignment: center;
                 horizontal-alignment: center;
@@ -103,7 +107,7 @@ export component AppWindow inherits Window {
             }
 
             Text {
-                text: "WC: ";
+                text: "  WC: ";
                 font-size: 30px;
                 vertical-alignment: center;
                 horizontal-alignment: center;
