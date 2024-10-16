@@ -13,7 +13,7 @@ int main(int argc, char **argv) {
   auto ui = AppWindow::create();
 
   BC bc;
-  bc.startBc(0x0000);
+  // bc.startBc(0x0000);
 
   ui->on_sendPressed([&](int commandType) {
     int rt = ui->global<guiGlobals>().get_rt();
