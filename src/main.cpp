@@ -1,19 +1,18 @@
 #include "app-window.h"
 #include "bc.hpp"
 #include <iostream>
-
-// TODO(renda): replace with data from gui
-U16BIT data[] = {0X0000, 0x1111, 0x2222, 0x3333, 0x4444, 0x5555, 0x6666,
-                 0x7777, 0x8888, 0x9999, 0xAAAA, 0xBBBB, 0xCCCC, 0xDDDD,
-                 0xEEEE, 0xFFFF, 0x0001, 0x0002, 0x0004, 0x0008, 0x0010,
-                 0x0020, 0x0040, 0x0080, 0x0100, 0x0200, 0x0400, 0x0800,
-                 0x1000, 0x2000, 0x4000, 0x8000};
+#include <string>
 
 int main(int argc, char **argv) {
+  int errorCode = 0;
+
   auto ui = AppWindow::create();
 
   BC bc;
-  // bc.startBc(0x0000);
+  errorCode = bc.startBc(0x0000);
+  if (errorCode != 0) {
+    ui->invoke_setError(BuErrorStr(errorCode));
+  }
 
   ui->on_sendPressed([&](int commandType) {
     int rt = ui->global<guiGlobals>().get_rt();
@@ -22,10 +21,30 @@ int main(int argc, char **argv) {
     slint::SharedString busString = ui->global<guiGlobals>().get_bus();
     BUS bus = busString == "A" ? BUS::A : BUS::B;
 
+    U16BIT data[32];
+
+    for (int i = 0; i < ui->global<guiGlobals>().get_words()->row_count();
+         ++i) {
+      auto hexWordString =
+          ui->global<guiGlobals>().get_words()->row_data(i)->data();
+
+      // Convert string to unsigned short
+      data[i] =
+          static_cast<unsigned short>(strtoul(hexWordString, nullptr, 16));
+    }
+
     if (commandType == 0) {
-      bc.bcToRt(rt, sa, wc, bus, data);
+      errorCode = bc.bcToRt(rt, sa, wc, bus, data);
+
+      if (errorCode != 0) {
+        ui->invoke_setError(BuErrorStr(errorCode));
+      }
     } else if (commandType == 1) {
-      bc.rtToBc(rt, sa, wc, bus, data);
+      errorCode = bc.rtToBc(rt, sa, wc, bus, data);
+
+      if (errorCode != 0) {
+        ui->invoke_setError(BuErrorStr(errorCode));
+      }
     }
   });
 

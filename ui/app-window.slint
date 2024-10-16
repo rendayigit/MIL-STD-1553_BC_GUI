@@ -7,6 +7,7 @@ export global guiGlobals {
     in property <int> sa;
     in property <int> wc;
     in property <string> bus;
+    in property <[string]> words;
 }
 
 export component AppWindow inherits Window {
@@ -18,6 +19,10 @@ export component AppWindow inherits Window {
 
     property <int> commandType: 0; // Bc->RT: 0, RT->BC:1, RT->RT:2
     callback sendPressed(int);
+
+    public function setError(errorMsg : string) {
+        errorText.text = errorMsg;
+    }
 
     init => {
         Palette.color-scheme = ColorScheme.dark;
@@ -55,6 +60,40 @@ export component AppWindow inherits Window {
                 text: "Send";
                 primary: true;
                 clicked => {
+                    guiGlobals.words = [
+                        "0x" + word0.text,
+                        "0x" + word1.text,
+                        "0x" + word2.text,
+                        "0x" + word3.text,
+                        "0x" + word4.text,
+                        "0x" + word5.text,
+                        "0x" + word6.text,
+                        "0x" + word7.text,
+                        "0x" + word8.text,
+                        "0x" + word9.text,
+                        "0x" + word10.text,
+                        "0x" + word11.text,
+                        "0x" + word12.text,
+                        "0x" + word13.text,
+                        "0x" + word14.text,
+                        "0x" + word15.text,
+                        "0x" + word16.text,
+                        "0x" + word17.text,
+                        "0x" + word18.text,
+                        "0x" + word19.text,
+                        "0x" + word20.text,
+                        "0x" + word21.text,
+                        "0x" + word22.text,
+                        "0x" + word23.text,
+                        "0x" + word24.text,
+                        "0x" + word25.text,
+                        "0x" + word26.text,
+                        "0x" + word27.text,
+                        "0x" + word28.text,
+                        "0x" + word29.text,
+                        "0x" + word30.text,
+                        "0x" + word31.text
+                    ];
                     sendPressed(commandType);
                 }
             }
@@ -125,44 +164,60 @@ export component AppWindow inherits Window {
             spacing: 15px;
             
             Row{
-                Word-Box {}
-                Word-Box {}
-                Word-Box {}
-                Word-Box {}
-                Word-Box {}
-                Word-Box {}
-                Word-Box {}
-                Word-Box {}
+                word0 := Word-Box {text: "0000";}
+                word1 := Word-Box {text: "1111";}
+                word2 := Word-Box {text: "2222";}
+                word3 := Word-Box {text: "3333";}
+                word4 := Word-Box {text: "4444";}
+                word5 := Word-Box {text: "5555";}
+                word6 := Word-Box {text: "6666";}
+                word7 := Word-Box {text: "7777";}
             }
             Row{
-                Word-Box {}
-                Word-Box {}
-                Word-Box {}
-                Word-Box {}
-                Word-Box {}
-                Word-Box {}
-                Word-Box {}
-                Word-Box {}
+                word8 := Word-Box  {text: "8888";}
+                word9 := Word-Box  {text: "9999";}
+                word10 := Word-Box {text: "AAAA";}
+                word11 := Word-Box {text: "BBBB";}
+                word12 := Word-Box {text: "CCCC";}
+                word13 := Word-Box {text: "DDDD";}
+                word14 := Word-Box {text: "EEEE";}
+                word15 := Word-Box {text: "FFFF";}
             }
             Row{
-                Word-Box {}
-                Word-Box {}
-                Word-Box {}
-                Word-Box {}
-                Word-Box {}
-                Word-Box {}
-                Word-Box {}
-                Word-Box {}
+                word16 := Word-Box {text: "0001";}
+                word17 := Word-Box {text: "0002";}
+                word18 := Word-Box {text: "0004";}
+                word19 := Word-Box {text: "0008";}
+                word20 := Word-Box {text: "0010";}
+                word21 := Word-Box {text: "0020";}
+                word22 := Word-Box {text: "0040";}
+                word23 := Word-Box {text: "0080";}
             }
             Row{
-                Word-Box {}
-                Word-Box {}
-                Word-Box {}
-                Word-Box {}
-                Word-Box {}
-                Word-Box {}
-                Word-Box {}
-                Word-Box {}
+                word24 := Word-Box {text: "0100";}
+                word25 := Word-Box {text: "0200";}
+                word26 := Word-Box {text: "0400";}
+                word27 := Word-Box {text: "0800";}
+                word28 := Word-Box {text: "1000";}
+                word29 := Word-Box {text: "2000";}
+                word30 := Word-Box {text: "4000";}
+                word31 := Word-Box {text: "8000";}
+            }
+        }
+
+        HorizontalLayout {
+            height: 20px;
+            padding-left: 10px;
+            padding-right: 10px;
+
+            errorText := Text {
+                text: "hello!";
+                color: red;
+            }
+
+            timeText := Text {
+                horizontal-alignment: right;
+                text: "0";
             }
         }
     }

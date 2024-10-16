@@ -15,21 +15,35 @@ int BC::startBc(S16BIT devNum) {
   Err = BuOpenLinux(&Conf);
 
   if (Err) {
-    std::cerr << "BuError " << Err << BuErrorStr(Err) << std::endl;
+    return Err;
   }
 
   // Opens bus controller mode
-  BuBCOpen();
+  Err = BuBCOpen();
+
+  if (Err) {
+    return Err;
+  }
 
   // set response timeout to 50.5 us
-  BuTimeout(RESPONSE_505);
+  Err = BuTimeout(RESPONSE_505);
+
+  if (Err) {
+    return Err;
+  }
 
   return 0;
 }
 
 int BC::stopBc() {
+  BuError_t Err;
+
   // Closes bus controller mode
-  BuBCClose();
+  Err = BuBCClose();
+
+  if (Err) {
+    return Err;
+  }
 
   return 0;
 }
@@ -54,6 +68,8 @@ int BC::rtToBc(int rt, int sa, int wc, BUS bus, U16BIT data[]) {
 }
 
 int BC::transmit(BCMsgHandle msg) {
+  BuError_t Err;
+
   // Minor frame handle
   BCMinorFrmHandle myframe;
 
@@ -61,10 +77,19 @@ int BC::transmit(BCMsgHandle msg) {
   myframe = BuBCXMinorFrm(30000l, 1, &msg);
 
   // load minor frame into ACE stack
-  BuBCLoadMinor(BU_BCFRMBUFA, myframe);
+  Err = BuBCLoadMinor(BU_BCFRMBUFA, myframe);
+
+  if (Err) {
+    return Err;
+  }
+
 
   // Run frame
-  BuBCRunMinor(BU_BCFRMBUFA, BU_BCSINGLE);
+  Err = BuBCRunMinor(BU_BCFRMBUFA, BU_BCSINGLE);
+
+  if (Err) {
+    return Err;
+  }
 
   while (BuBCIsFrmActive())
     ;

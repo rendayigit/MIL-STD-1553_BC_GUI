@@ -2,6 +2,7 @@
 #define BC_HPP
 
 #include "stdace.h"
+#include <string>
 
 enum class BUS { A = 0x0080, B = 0x0000 };
 
