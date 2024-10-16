@@ -11,7 +11,10 @@ export global guiGlobals {
 
 export component AppWindow inherits Window {
     min-width: 600px;
-    min-height: 500px;
+    preferred-width: 600px;
+
+    min-height: 400px;
+    preferred-height: 400px;
 
     property <int> commandType: 0; // Bc->RT: 0, RT->BC:1, RT->RT:2
     callback sendPressed(int);
