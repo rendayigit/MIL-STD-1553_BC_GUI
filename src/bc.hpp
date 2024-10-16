@@ -1,7 +1,7 @@
 #ifndef BC_HPP
 #define BC_HPP
 
-#include "stdemace.h"
+#include "stdace.h"
 
 enum class BUS { A = 0x0080, B = 0x0000 };
 
@@ -16,6 +16,9 @@ public:
   int rtToBc(int rt, int sa, int wc, BUS bus, U16BIT data[]);
 
 private:
+  int transmit(BCMsgHandle msg);
+  int displayResult(BCMinorFrmHandle minorFrameHandle);
+
   S16BIT m_devNum;
 };
 

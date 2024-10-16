@@ -6,13 +6,12 @@ export global guiGlobals {
     in property <int> wc;
 }
 
-
-
 export component AppWindow inherits Window {
     preferred-width: 800px;
     preferred-height: 600px;
 
-    callback sendPressed();
+    property <int> commandType: 0; // Bc->RT: 0, RT->BC:1, RT->RT:2
+    callback sendPressed(int);
 
     VerticalLayout {
         HorizontalLayout {
@@ -20,21 +19,29 @@ export component AppWindow inherits Window {
                 text: "BC to RT";
                 checked: true;
                 toggled => {
-                    rtToBcCheckBox.checked = !self.checked
+                    rtToBcCheckBox.checked = !self.checked;
+
+                    if(bcToRtCheckBox.checked) {
+                        commandType = 0;
+                    }
                 }
             }
 
             rtToBcCheckBox := CheckBox {
                 text: "RT to BC";
                 toggled => {
-                    bcToRtCheckBox.checked = !self.checked
+                    bcToRtCheckBox.checked = !self.checked;
+
+                    if(rtToBcCheckBox.checked) {
+                        commandType = 1;
+                    }
                 }
             }
 
             Button {
                 text: "Send";
                 clicked => {
-                    sendPressed();
+                    sendPressed(commandType);
                 }
             }
         }
