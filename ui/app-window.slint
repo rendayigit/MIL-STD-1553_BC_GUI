@@ -4,6 +4,7 @@ export global guiGlobals {
     in property <int> rt;
     in property <int> sa;
     in property <int> wc;
+    in property <string> bus;
 }
 
 export component AppWindow inherits Window {
@@ -21,7 +22,7 @@ export component AppWindow inherits Window {
                 toggled => {
                     rtToBcCheckBox.checked = !self.checked;
 
-                    if(bcToRtCheckBox.checked) {
+                    if (bcToRtCheckBox.checked) {
                         commandType = 0;
                     }
                 }
@@ -32,7 +33,7 @@ export component AppWindow inherits Window {
                 toggled => {
                     bcToRtCheckBox.checked = !self.checked;
 
-                    if(rtToBcCheckBox.checked) {
+                    if (rtToBcCheckBox.checked) {
                         commandType = 1;
                     }
                 }
@@ -50,6 +51,22 @@ export component AppWindow inherits Window {
             height: 50px;
 
             Text {
+                text: "Bus: ";
+                font-size: 30px;
+                vertical-alignment: center;
+                horizontal-alignment: center;
+            }
+
+            busComboBox := ComboBox {
+                current-value: "A";
+                width: 75px;
+                selected => {
+                    guiGlobals.bus = self.current-value;
+                }
+                model: ["A", "B"];
+            }
+
+            Text {
                 text: "RT: ";
                 font-size: 30px;
                 vertical-alignment: center;
@@ -58,6 +75,7 @@ export component AppWindow inherits Window {
 
             rtComboBox := ComboBox {
                 current-value: "0";
+                width: 75px;
                 selected => {
                     guiGlobals.rt = self.current-value.to-float();
                 }
@@ -106,6 +124,7 @@ export component AppWindow inherits Window {
 
             saComboBox := ComboBox {
                 current-value: "0";
+                width: 75px;
                 selected => {
                     guiGlobals.sa = self.current-value.to-float();
                 }
@@ -154,6 +173,7 @@ export component AppWindow inherits Window {
 
             wcComboBox := ComboBox {
                 current-value: "0";
+                width: 75px;
                 selected => {
                     guiGlobals.wc = self.current-value.to-float();
                 }

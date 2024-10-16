@@ -9,9 +9,6 @@ U16BIT data[] = {0X0000, 0x1111, 0x2222, 0x3333, 0x4444, 0x5555, 0x6666,
                  0x0020, 0x0040, 0x0080, 0x0100, 0x0200, 0x0400, 0x0800,
                  0x1000, 0x2000, 0x4000, 0x8000};
 
-// TODO(renda): replace with bus selection from gui
-BUS bus = BUS::A;
-
 int main(int argc, char **argv) {
   auto ui = AppWindow::create();
 
@@ -22,6 +19,8 @@ int main(int argc, char **argv) {
     int rt = ui->global<guiGlobals>().get_rt();
     int sa = ui->global<guiGlobals>().get_sa();
     int wc = ui->global<guiGlobals>().get_wc();
+    slint::SharedString busString = ui->global<guiGlobals>().get_bus();
+    BUS bus = busString == "A" ? BUS::A : BUS::B;
 
     if (commandType == 0) {
       bc.bcToRt(rt, sa, wc, bus, data);
