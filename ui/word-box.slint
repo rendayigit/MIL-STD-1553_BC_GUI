@@ -1,0 +1,40 @@
+import { TextEdit } from "std-widgets.slint";
+
+export component Word-Box inherits TextInput {
+    property <[string]> allowed-chars: [
+        "0",
+        "1",
+        "2",
+        "3",
+        "4",
+        "5",
+        "6",
+        "7",
+        "8",
+        "9",
+        "A",
+        "B",
+        "C",
+        "D",
+        "E",
+        "F"
+    ];
+
+    Rectangle {
+        background: gray;
+        opacity: 50%;
+        width: 100%;
+        height: 100%;
+    }
+
+    font-size: 20px;
+    max-height: 40px;
+    max-width: 125px;
+    horizontal-alignment: center;
+    vertical-alignment: center;
+    text: "0000";
+
+    edited => {
+
+    }
+}

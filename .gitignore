@@ -1,5 +1,5 @@
 # Executables
-./bin/
+bin/bc-gui
 
 # clangd cache
 .cache/

@@ -1,4 +1,6 @@
-import { Button, CheckBox, ComboBox } from "std-widgets.slint";
+import { Button, CheckBox, ComboBox, TextEdit } from "std-widgets.slint";
+import { Rt-Sa-Wc-ComboBox } from "rt-sa-wc.slint";
+import { Word-Box } from "word-box.slint";
 
 export global guiGlobals {
     in property <int> rt;
@@ -8,14 +10,17 @@ export global guiGlobals {
 }
 
 export component AppWindow inherits Window {
-    preferred-width: 600px;
-    preferred-height: 600px;
+    min-width: 600px;
+    min-height: 500px;
 
     property <int> commandType: 0; // Bc->RT: 0, RT->BC:1, RT->RT:2
     callback sendPressed(int);
 
     VerticalLayout {
         HorizontalLayout {
+            padding: 25px;
+            alignment: end;
+
             bcToRtCheckBox := CheckBox {
                 text: "BC to RT";
                 checked: true;
@@ -41,6 +46,7 @@ export component AppWindow inherits Window {
 
             Button {
                 text: "Send";
+                primary: true;
                 clicked => {
                     sendPressed(commandType);
                 }
@@ -48,7 +54,8 @@ export component AppWindow inherits Window {
         }
 
         HorizontalLayout {
-            height: 50px;
+            padding: 25px;
+            alignment: center;
 
             Text {
                 text: "Bus: ";
@@ -73,46 +80,10 @@ export component AppWindow inherits Window {
                 horizontal-alignment: center;
             }
 
-            rtComboBox := ComboBox {
-                current-value: "0";
-                width: 75px;
+            Rt-Sa-Wc-ComboBox {
                 selected => {
                     guiGlobals.rt = self.current-value.to-float();
                 }
-                model: [
-                    0,
-                    1,
-                    2,
-                    3,
-                    4,
-                    5,
-                    6,
-                    7,
-                    8,
-                    9,
-                    10,
-                    11,
-                    12,
-                    13,
-                    14,
-                    15,
-                    16,
-                    17,
-                    18,
-                    19,
-                    20,
-                    21,
-                    22,
-                    23,
-                    24,
-                    25,
-                    26,
-                    27,
-                    28,
-                    29,
-                    30,
-                    31
-                ];
             }
 
             Text {
@@ -122,46 +93,10 @@ export component AppWindow inherits Window {
                 horizontal-alignment: center;
             }
 
-            saComboBox := ComboBox {
-                current-value: "0";
-                width: 75px;
+            Rt-Sa-Wc-ComboBox {
                 selected => {
                     guiGlobals.sa = self.current-value.to-float();
                 }
-                model: [
-                    0,
-                    1,
-                    2,
-                    3,
-                    4,
-                    5,
-                    6,
-                    7,
-                    8,
-                    9,
-                    10,
-                    11,
-                    12,
-                    13,
-                    14,
-                    15,
-                    16,
-                    17,
-                    18,
-                    19,
-                    20,
-                    21,
-                    22,
-                    23,
-                    24,
-                    25,
-                    26,
-                    27,
-                    28,
-                    29,
-                    30,
-                    31
-                ];
             }
 
             Text {
@@ -171,46 +106,56 @@ export component AppWindow inherits Window {
                 horizontal-alignment: center;
             }
 
-            wcComboBox := ComboBox {
-                current-value: "0";
-                width: 75px;
+            Rt-Sa-Wc-ComboBox {
                 selected => {
                     guiGlobals.wc = self.current-value.to-float();
                 }
-                model: [
-                    0,
-                    1,
-                    2,
-                    3,
-                    4,
-                    5,
-                    6,
-                    7,
-                    8,
-                    9,
-                    10,
-                    11,
-                    12,
-                    13,
-                    14,
-                    15,
-                    16,
-                    17,
-                    18,
-                    19,
-                    20,
-                    21,
-                    22,
-                    23,
-                    24,
-                    25,
-                    26,
-                    27,
-                    28,
-                    29,
-                    30,
-                    31
-                ];
+            }
+        }
+
+        GridLayout {
+            padding: 15px;
+            spacing: 15px;
+            
+            Row{
+                Word-Box {}
+                Word-Box {}
+                Word-Box {}
+                Word-Box {}
+                Word-Box {}
+                Word-Box {}
+                Word-Box {}
+                Word-Box {}
+            }
+            Row{
+                Word-Box {}
+                Word-Box {}
+                Word-Box {}
+                Word-Box {}
+                Word-Box {}
+                Word-Box {}
+                Word-Box {}
+                Word-Box {}
+            }
+            Row{
+                Word-Box {}
+                Word-Box {}
+                Word-Box {}
+                Word-Box {}
+                Word-Box {}
+                Word-Box {}
+                Word-Box {}
+                Word-Box {}
+            }
+            Row{
+                Word-Box {}
+                Word-Box {}
+                Word-Box {}
+                Word-Box {}
+                Word-Box {}
+                Word-Box {}
+                Word-Box {}
+                Word-Box {}
             }
         }
     }
