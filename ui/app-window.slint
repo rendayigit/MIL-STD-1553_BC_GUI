@@ -20,8 +20,13 @@ export component AppWindow inherits Window {
     property <int> commandType: 0; // Bc->RT: 0, RT->BC:1, RT->RT:2
     callback sendPressed(int);
 
-    public function setError(errorMsg : string) {
+    public function setError(errorMsg: string) {
+        errorText.color = Colors.red;
         errorText.text = errorMsg;
+    }
+
+    public function setTime(time: string) {
+        timeText.text = time;
     }
 
     init => {
@@ -162,46 +167,140 @@ export component AppWindow inherits Window {
         GridLayout {
             padding: 15px;
             spacing: 15px;
-            
-            Row{
-                word0 := Word-Box {text: "0000";}
-                word1 := Word-Box {text: "1111";}
-                word2 := Word-Box {text: "2222";}
-                word3 := Word-Box {text: "3333";}
-                word4 := Word-Box {text: "4444";}
-                word5 := Word-Box {text: "5555";}
-                word6 := Word-Box {text: "6666";}
-                word7 := Word-Box {text: "7777";}
+            Row {
+                word0 := Word-Box {
+                    text: "0000";
+                }
+
+                word1 := Word-Box {
+                    text: "1111";
+                }
+
+                word2 := Word-Box {
+                    text: "2222";
+                }
+
+                word3 := Word-Box {
+                    text: "3333";
+                }
+
+                word4 := Word-Box {
+                    text: "4444";
+                }
+
+                word5 := Word-Box {
+                    text: "5555";
+                }
+
+                word6 := Word-Box {
+                    text: "6666";
+                }
+
+                word7 := Word-Box {
+                    text: "7777";
+                }
             }
-            Row{
-                word8 := Word-Box  {text: "8888";}
-                word9 := Word-Box  {text: "9999";}
-                word10 := Word-Box {text: "AAAA";}
-                word11 := Word-Box {text: "BBBB";}
-                word12 := Word-Box {text: "CCCC";}
-                word13 := Word-Box {text: "DDDD";}
-                word14 := Word-Box {text: "EEEE";}
-                word15 := Word-Box {text: "FFFF";}
+
+            Row {
+                word8 := Word-Box {
+                    text: "8888";
+                }
+
+                word9 := Word-Box {
+                    text: "9999";
+                }
+
+                word10 := Word-Box {
+                    text: "AAAA";
+                }
+
+                word11 := Word-Box {
+                    text: "BBBB";
+                }
+
+                word12 := Word-Box {
+                    text: "CCCC";
+                }
+
+                word13 := Word-Box {
+                    text: "DDDD";
+                }
+
+                word14 := Word-Box {
+                    text: "EEEE";
+                }
+
+                word15 := Word-Box {
+                    text: "FFFF";
+                }
             }
-            Row{
-                word16 := Word-Box {text: "0001";}
-                word17 := Word-Box {text: "0002";}
-                word18 := Word-Box {text: "0004";}
-                word19 := Word-Box {text: "0008";}
-                word20 := Word-Box {text: "0010";}
-                word21 := Word-Box {text: "0020";}
-                word22 := Word-Box {text: "0040";}
-                word23 := Word-Box {text: "0080";}
+
+            Row {
+                word16 := Word-Box {
+                    text: "0001";
+                }
+
+                word17 := Word-Box {
+                    text: "0002";
+                }
+
+                word18 := Word-Box {
+                    text: "0004";
+                }
+
+                word19 := Word-Box {
+                    text: "0008";
+                }
+
+                word20 := Word-Box {
+                    text: "0010";
+                }
+
+                word21 := Word-Box {
+                    text: "0020";
+                }
+
+                word22 := Word-Box {
+                    text: "0040";
+                }
+
+                word23 := Word-Box {
+                    text: "0080";
+                }
             }
-            Row{
-                word24 := Word-Box {text: "0100";}
-                word25 := Word-Box {text: "0200";}
-                word26 := Word-Box {text: "0400";}
-                word27 := Word-Box {text: "0800";}
-                word28 := Word-Box {text: "1000";}
-                word29 := Word-Box {text: "2000";}
-                word30 := Word-Box {text: "4000";}
-                word31 := Word-Box {text: "8000";}
+
+            Row {
+                word24 := Word-Box {
+                    text: "0100";
+                }
+
+                word25 := Word-Box {
+                    text: "0200";
+                }
+
+                word26 := Word-Box {
+                    text: "0400";
+                }
+
+                word27 := Word-Box {
+                    text: "0800";
+                }
+
+                word28 := Word-Box {
+                    text: "1000";
+                }
+
+                word29 := Word-Box {
+                    text: "2000";
+                }
+
+                word30 := Word-Box {
+                    text: "4000";
+                }
+
+                word31 := Word-Box {
+                    text: "8000";
+                }
             }
         }
 
@@ -211,8 +310,8 @@ export component AppWindow inherits Window {
             padding-right: 10px;
 
             errorText := Text {
-                text: "hello!";
-                color: red;
+                text: "🗹";
+                color: green;
             }
 
             timeText := Text {
