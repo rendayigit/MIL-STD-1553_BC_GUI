@@ -7,8 +7,6 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_CURRENT_LIST_DIR}/bin/)
 # Find slint installation
 find_package(${CMAKE_CURRENT_LIST_DIR}/deps/slint-1.8/lib/cmake/Slint/Slint REQUIRED)
 
-SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fPIE -D_ACELINUX -pthread")
-
 add_executable(bc-gui 
     ${CMAKE_SOURCE_DIR}/src/main.cpp
     ${CMAKE_SOURCE_DIR}/src/bc.cpp

@@ -72,16 +72,11 @@ int main(int argc, char **argv) {
     slint::SharedString busString = ui->global<guiGlobals>().get_bus();
     BUS bus = busString == "A" ? BUS::A : BUS::B;
 
-    U16BIT data[32];
+    std::array<std::string, 32> data;
 
     for (int i = 0; i < ui->global<guiGlobals>().get_words()->row_count();
          ++i) {
-      auto hexWordString =
-          ui->global<guiGlobals>().get_words()->row_data(i)->data();
-
-      // Convert string to unsigned short
-      data[i] =
-          static_cast<unsigned short>(strtoul(hexWordString, nullptr, 16));
+      data.at(i) = ui->global<guiGlobals>().get_words()->row_data(i)->data();
     }
 
     if (commandType == 0) {
@@ -91,7 +86,7 @@ int main(int argc, char **argv) {
         ui->invoke_setError(BuErrorStr(errorCode));
       }
     } else if (commandType == 1) {
-      errorCode = bc.rtToBc(rt, sa, wc, bus, data);
+      errorCode = bc.rtToBc(rt, sa, wc, bus);
 
       if (errorCode != 0) {
         ui->invoke_setError(BuErrorStr(errorCode));

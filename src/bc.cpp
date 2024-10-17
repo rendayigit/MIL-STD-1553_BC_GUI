@@ -50,17 +50,25 @@ int BC::stopBc() {
   return 0;
 }
 
-int BC::bcToRt(int rt, int sa, int wc, BUS bus, U16BIT data[]) {
+int BC::bcToRt(int rt, int sa, int wc, BUS bus,
+               std::array<std::string, 32> data) {
   BCMsgHandle msg;
+  U16BIT hexData[32];
 
-  msg = BuBCXBCtoRT((U8BIT)rt, (U8BIT)sa, (U8BIT)wc, (U8BIT)bus, data,
+  for (int i = 0; i < 32; ++i) {
+    // Convert string to unsigned short
+    hexData[i] =
+        static_cast<unsigned short>(strtoul(data.at(i).c_str(), nullptr, 16));
+  }
+
+  msg = BuBCXBCtoRT((U8BIT)rt, (U8BIT)sa, (U8BIT)wc, (U8BIT)bus, hexData,
                     BU_BCNOGAP, BU_BCALWAYS);
 
   int transmitStatus = transmit(msg);
   return transmitStatus;
 }
 
-int BC::rtToBc(int rt, int sa, int wc, BUS bus, U16BIT data[]) {
+int BC::rtToBc(int rt, int sa, int wc, BUS bus) {
   BCMsgHandle msg;
   msg = BuBCXRTtoBC((U8BIT)rt, (U8BIT)sa, (U8BIT)wc, (U8BIT)bus, BU_BCNOGAP,
                     BU_BCALWAYS);
