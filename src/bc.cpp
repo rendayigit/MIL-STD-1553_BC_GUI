@@ -13,7 +13,8 @@ int BC::startBc(S16BIT devNum) {
   BuConf_t Conf; // ACE library configuration type
   BuError_t Err; // ACE library error status type
 
-  Conf.ConfDev = 0x0000; // TODO(renda): set from gui
+  Conf.ConfDev = devNum;
+  
   Err = BuOpenLinux(&Conf);
 
   if (Err) {
