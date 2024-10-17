@@ -80,7 +80,6 @@ int main(int argc, char **argv) {
       data.at(i) = ui->global<guiGlobals>().get_words()->row_data(i)->data();
     }
 
-    // FIXME bug with commandType selection
     if (commandType == 0) {
       errorCode = bc.bcToRt(rt, sa, wc, bus, data);
 
