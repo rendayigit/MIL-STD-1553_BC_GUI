@@ -1,5 +1,6 @@
 #include "app-window.h"
 #include "bc.hpp"
+#include "common.hpp"
 #include <chrono>
 #include <ctime>
 #include <iomanip>
@@ -61,7 +62,7 @@ int main(int argc, char **argv) {
     if (errorCode == 0) {
       ui->invoke_setStatus("✅");
     } else {
-      ui->invoke_setError(BC::getStatus(errorCode).c_str());
+      ui->invoke_setError(getStatus(errorCode).c_str());
     }
   });
 
@@ -84,13 +85,13 @@ int main(int argc, char **argv) {
       errorCode = bc.bcToRt(rt, sa, wc, bus, data);
 
       if (errorCode != 0) {
-        ui->invoke_setError(BC::getStatus(errorCode).c_str());
+        ui->invoke_setError(getStatus(errorCode).c_str());
       }
     } else if (commandType == 1) {
       errorCode = bc.rtToBc(rt, sa, wc, bus);
 
       if (errorCode != 0) {
-        ui->invoke_setError(BC::getStatus(errorCode).c_str());
+        ui->invoke_setError(getStatus(errorCode).c_str());
       }
     }
   });

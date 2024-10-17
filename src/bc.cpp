@@ -11,12 +11,6 @@ int BC::startBc(S16BIT devNum) {
 
   m_devNum = devNum;
 
-  U16BIT wBuffer[64] = {0x1111, 0x2222, 0x3333, 0x4444, 0x1111, 0x2222, 0x3333,
-                        0x4444, 0x1111, 0x2222, 0x3333, 0x4444, 0x1111, 0x2222,
-                        0x3333, 0x4444, 0x1111, 0x2222, 0x3333, 0x4444, 0x1111,
-                        0x2222, 0x3333, 0x4444, 0x1111, 0x2222, 0x3333, 0x4444,
-                        0x1111, 0x2222, 0x3333, 0x4444};
-
   Err = aceInitialize(m_devNum, ACE_ACCESS_CARD, ACE_MODE_BC, 0, 0, 0);
 
   if (Err) {
@@ -27,7 +21,13 @@ int BC::startBc(S16BIT devNum) {
 }
 
 int BC::stopBc() {
-  // TODO
+  S16BIT Err;
+
+  Err = aceBCStop(m_devNum);
+
+  if (Err) {
+    return Err;
+  }
 
   return 0;
 }
@@ -45,7 +45,7 @@ int BC::bcToRt(int rt, int sa, int wc, U8BIT bus,
 
   int messageId = 1;
   int dataBlockId = 1;
-  dataBlockId ++;
+  dataBlockId++;
 
   int opCode1 = 1;
   int opCode2 = 2;
@@ -61,14 +61,8 @@ int BC::bcToRt(int rt, int sa, int wc, U8BIT bus,
   }
 
   // Create message block
-  Err = aceBCMsgCreateBCtoRT(m_devNum,      // Device number
-                             messageId,     // Message ID to create
-                             dataBlockId, // Message will use this data block
-                             rt,            // RT
-                             sa,            // SA
-                             wc,            // Word count
-                             0,             // Default message timer
-                             bus); // use chl A options
+  Err = aceBCMsgCreateBCtoRT(m_devNum, messageId, dataBlockId, rt, sa, wc, 0,
+                             bus);
   if (Err) {
     return Err;
   }
@@ -105,22 +99,14 @@ int BC::bcToRt(int rt, int sa, int wc, U8BIT bus,
     return Err;
   }
 
-  // Create Host Buffer
-  Err = aceBCInstallHBuf(m_devNum, 16 * 1024);
-  if (Err) {
-    return Err;
-  }
-
   // Start BC
-  int repeatCount = 2;
+  int repeatCount = 1; // Set to -1 for infinite
   Err = aceBCStart(m_devNum, majorFrame, repeatCount);
   if (Err) {
     return Err;
   }
 
-  aceBCDataBlkDelete(m_devNum, dataBlockId);
-
-  // aceBCDataBlkWrite(S16BIT DevNum, S16BIT nDataBlkID, U16BIT *pBuffer, U16BIT wBufferSize, U16BIT wOffset)
+  aceBCDataBlkDelete(m_devNum, dataBlockId); // FIXME: does nothing
 
   return 0;
 }
