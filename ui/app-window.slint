@@ -100,6 +100,9 @@ export component AppWindow inherits Window {
                     primary: true;
                     clicked => {
                         guiGlobals.bus = busComboBox.current-value;
+                        guiGlobals.rt = rt-ComboBox.current-value.to-float();
+                        guiGlobals.sa = sa-ComboBox.current-value.to-float();
+                        guiGlobals.wc = wc-ComboBox.current-value.to-float();
                         guiGlobals.words = [
                             "0x" + word0.text,
                             "0x" + word1.text,
@@ -164,11 +167,7 @@ export component AppWindow inherits Window {
                 horizontal-alignment: center;
             }
 
-            Rt-Sa-Wc-ComboBox {
-                selected => {
-                    guiGlobals.rt = self.current-value.to-float();
-                }
-            }
+            rt-ComboBox := Rt-Sa-Wc-ComboBox { }
 
             Text {
                 text: "  SA: ";
@@ -177,11 +176,7 @@ export component AppWindow inherits Window {
                 horizontal-alignment: center;
             }
 
-            Rt-Sa-Wc-ComboBox {
-                selected => {
-                    guiGlobals.sa = self.current-value.to-float();
-                }
-            }
+            sa-ComboBox := Rt-Sa-Wc-ComboBox { }
 
             Text {
                 text: "  WC: ";
@@ -190,11 +185,8 @@ export component AppWindow inherits Window {
                 horizontal-alignment: center;
             }
 
-            Rt-Sa-Wc-ComboBox {
-                current-value: 31;
-                selected => {
-                    guiGlobals.wc = self.current-value.to-float();
-                }
+            wc-ComboBox := Rt-Sa-Wc-ComboBox {
+                current-value: 32;
             }
         }
 
