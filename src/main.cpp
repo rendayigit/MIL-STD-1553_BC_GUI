@@ -52,10 +52,18 @@ int main(int argc, char **argv) {
   // });
 
   BC bc;
-  errorCode = bc.startBc(0x0000);
-  if (errorCode != 0) {
-    ui->invoke_setError(BuErrorStr(errorCode));
-  }
+
+  ui->on_connectPressed([&] {
+    U8BIT deviceNum = static_cast<unsigned short>(
+        strtoul(ui->global<guiGlobals>().get_device().data(), nullptr, 16));
+
+    errorCode = bc.startBc(deviceNum);
+    if (errorCode == 0) {
+      ui->invoke_setStatus("✅");
+    } else {
+      ui->invoke_setError(BuErrorStr(errorCode));
+    }
+  });
 
   ui->on_sendPressed([&](int commandType) {
     int rt = ui->global<guiGlobals>().get_rt();

@@ -3,6 +3,7 @@ import { Rt-Sa-Wc-ComboBox } from "rt-sa-wc.slint";
 import { Word-Box } from "word-box.slint";
 
 export global guiGlobals {
+    in property <string> device;
     in property <int> rt;
     in property <int> sa;
     in property <int> wc;
@@ -18,11 +19,17 @@ export component AppWindow inherits Window {
     preferred-height: 400px;
 
     property <int> commandType: 0; // Bc->RT: 0, RT->BC:1, RT->RT:2
+    callback connectPressed();
     callback sendPressed(int);
 
     public function setError(errorMsg: string) {
         errorText.color = Colors.red;
         errorText.text = errorMsg;
+    }
+
+    public function setStatus(statusMsg: string) {
+        errorText.color = Colors.green;
+        errorText.text = statusMsg;
     }
 
     public function setTime(time: string) {
@@ -35,72 +42,100 @@ export component AppWindow inherits Window {
 
     VerticalLayout {
         HorizontalLayout {
-            padding: 25px;
-            alignment: end;
+            HorizontalLayout {
+                padding: 25px;
+                spacing: 10px;
+                alignment: start;
 
-            bcToRtCheckBox := CheckBox {
-                text: "BC to RT";
-                checked: true;
-                toggled => {
-                    rtToBcCheckBox.checked = !self.checked;
+                Text {
+                    text: "Device#: ";
+                    font-size: 15px;
+                    vertical-alignment: center;
+                    horizontal-alignment: center;
+                }
 
-                    if (bcToRtCheckBox.checked) {
-                        commandType = 0;
+                device-box := Word-Box {
+                    text: "0000";
+                }
+
+                Button {
+                    text: "Connect";
+                    primary: true;
+                    clicked => {
+                        guiGlobals.device = device-box.text;
+                        connectPressed();
                     }
                 }
             }
 
-            rtToBcCheckBox := CheckBox {
-                text: "RT to BC";
-                toggled => {
-                    bcToRtCheckBox.checked = !self.checked;
+            HorizontalLayout {
+                padding: 25px;
+                alignment: end;
 
-                    if (rtToBcCheckBox.checked) {
-                        commandType = 1;
+                bcToRtCheckBox := CheckBox {
+                    text: "BC to RT";
+                    checked: true;
+                    toggled => {
+                        rtToBcCheckBox.checked = !self.checked;
+
+                        if (bcToRtCheckBox.checked) {
+                            commandType = 0;
+                        }
                     }
                 }
-            }
 
-            Button {
-                text: "Send";
-                primary: true;
-                clicked => {
-                    guiGlobals.bus = busComboBox.current-value;
-                    guiGlobals.words = [
-                        "0x" + word0.text,
-                        "0x" + word1.text,
-                        "0x" + word2.text,
-                        "0x" + word3.text,
-                        "0x" + word4.text,
-                        "0x" + word5.text,
-                        "0x" + word6.text,
-                        "0x" + word7.text,
-                        "0x" + word8.text,
-                        "0x" + word9.text,
-                        "0x" + word10.text,
-                        "0x" + word11.text,
-                        "0x" + word12.text,
-                        "0x" + word13.text,
-                        "0x" + word14.text,
-                        "0x" + word15.text,
-                        "0x" + word16.text,
-                        "0x" + word17.text,
-                        "0x" + word18.text,
-                        "0x" + word19.text,
-                        "0x" + word20.text,
-                        "0x" + word21.text,
-                        "0x" + word22.text,
-                        "0x" + word23.text,
-                        "0x" + word24.text,
-                        "0x" + word25.text,
-                        "0x" + word26.text,
-                        "0x" + word27.text,
-                        "0x" + word28.text,
-                        "0x" + word29.text,
-                        "0x" + word30.text,
-                        "0x" + word31.text
-                    ];
-                    sendPressed(commandType);
+                rtToBcCheckBox := CheckBox {
+                    text: "RT to BC";
+                    toggled => {
+                        bcToRtCheckBox.checked = !self.checked;
+
+                        if (rtToBcCheckBox.checked) {
+                            commandType = 1;
+                        }
+                    }
+                }
+
+                Button {
+                    text: "Send";
+                    primary: true;
+                    clicked => {
+                        guiGlobals.bus = busComboBox.current-value;
+                        guiGlobals.words = [
+                            "0x" + word0.text,
+                            "0x" + word1.text,
+                            "0x" + word2.text,
+                            "0x" + word3.text,
+                            "0x" + word4.text,
+                            "0x" + word5.text,
+                            "0x" + word6.text,
+                            "0x" + word7.text,
+                            "0x" + word8.text,
+                            "0x" + word9.text,
+                            "0x" + word10.text,
+                            "0x" + word11.text,
+                            "0x" + word12.text,
+                            "0x" + word13.text,
+                            "0x" + word14.text,
+                            "0x" + word15.text,
+                            "0x" + word16.text,
+                            "0x" + word17.text,
+                            "0x" + word18.text,
+                            "0x" + word19.text,
+                            "0x" + word20.text,
+                            "0x" + word21.text,
+                            "0x" + word22.text,
+                            "0x" + word23.text,
+                            "0x" + word24.text,
+                            "0x" + word25.text,
+                            "0x" + word26.text,
+                            "0x" + word27.text,
+                            "0x" + word28.text,
+                            "0x" + word29.text,
+                            "0x" + word30.text,
+                            "0x" + word31.text
+                        ];
+                        sendPressed(commandType);
+                    }
                 }
             }
         }
@@ -309,7 +344,6 @@ export component AppWindow inherits Window {
             padding-right: 10px;
 
             errorText := Text {
-                text: "🗹";
                 color: green;
             }
 

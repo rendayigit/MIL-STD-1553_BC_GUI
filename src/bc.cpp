@@ -10,8 +10,8 @@ BC::~BC() {
 }
 
 int BC::startBc(S16BIT devNum) {
-  BuConf_t Conf; /* ACE library configuration type */
-  BuError_t Err; /* ACE library error status type  */
+  BuConf_t Conf; // ACE library configuration type
+  BuError_t Err; // ACE library error status type
 
   Conf.ConfDev = 0x0000; // TODO(renda): set from gui
   Err = BuOpenLinux(&Conf);
@@ -123,8 +123,8 @@ int BC::displayResult(BCMinorFrmHandle minorFrameHandle) {
       printf(" Cmd2 %04X %s\n", readmsg.CmdWord2, BuCmdStr(readmsg.CmdWord2));
     }
 
-    printf(" Time %u uS\n", readmsg.TimeTag * 2); /*2us resolution*/
-    printf(" GapT %u uS\n", readmsg.GapTime);     /*1us resolution*/
+    printf(" Time %u uS\n", readmsg.TimeTag * 2); // 2us resolution
+    printf(" GapT %u uS\n", readmsg.GapTime);     // 1us resolution
     printf(" BSW  %04X %s\n", readmsg.BlockStatus,
            BuBCBSWErrorStr(readmsg.BlockStatus));
     printf(" Ctrl %04X \n", readmsg.ControlWord);
