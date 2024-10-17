@@ -65,6 +65,7 @@ export component AppWindow inherits Window {
                 text: "Send";
                 primary: true;
                 clicked => {
+                    guiGlobals.bus = busComboBox.current-value;
                     guiGlobals.words = [
                         "0x" + word0.text,
                         "0x" + word1.text,
@@ -118,9 +119,6 @@ export component AppWindow inherits Window {
             busComboBox := ComboBox {
                 current-value: "A";
                 width: 75px;
-                selected => {
-                    guiGlobals.bus = self.current-value;
-                }
                 model: ["A", "B"];
             }
 
@@ -158,6 +156,7 @@ export component AppWindow inherits Window {
             }
 
             Rt-Sa-Wc-ComboBox {
+                current-value: 31;
                 selected => {
                     guiGlobals.wc = self.current-value.to-float();
                 }

@@ -12,6 +12,8 @@ BC::~BC() {
 int BC::startBc(S16BIT devNum) {
   BuConf_t Conf; /* ACE library configuration type */
   BuError_t Err; /* ACE library error status type  */
+
+  Conf.ConfDev = 0x0000; // TODO(renda): set from gui
   Err = BuOpenLinux(&Conf);
 
   if (Err) {
@@ -82,7 +84,6 @@ int BC::transmit(BCMsgHandle msg) {
   if (Err) {
     return Err;
   }
-
 
   // Run frame
   Err = BuBCRunMinor(BU_BCFRMBUFA, BU_BCSINGLE);
