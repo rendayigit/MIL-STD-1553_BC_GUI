@@ -61,7 +61,7 @@ int main(int argc, char **argv) {
     if (errorCode == 0) {
       ui->invoke_setStatus("✅");
     } else {
-      ui->invoke_setError(BuErrorStr(errorCode));
+      ui->invoke_setError(BC::getStatus(errorCode).c_str());
     }
   });
 
@@ -70,7 +70,7 @@ int main(int argc, char **argv) {
     int sa = ui->global<guiGlobals>().get_sa();
     int wc = ui->global<guiGlobals>().get_wc();
     slint::SharedString busString = ui->global<guiGlobals>().get_bus();
-    BUS bus = busString == "A" ? BUS::A : BUS::B;
+    int bus = busString == "A" ? ACE_BCCTRL_CHL_A : ACE_BCCTRL_CHL_B;
 
     std::array<std::string, 32> data;
 
@@ -79,17 +79,18 @@ int main(int argc, char **argv) {
       data.at(i) = ui->global<guiGlobals>().get_words()->row_data(i)->data();
     }
 
+    // FIXME bug with commandType selection
     if (commandType == 0) {
       errorCode = bc.bcToRt(rt, sa, wc, bus, data);
 
       if (errorCode != 0) {
-        ui->invoke_setError(BuErrorStr(errorCode));
+        ui->invoke_setError(BC::getStatus(errorCode).c_str());
       }
     } else if (commandType == 1) {
       errorCode = bc.rtToBc(rt, sa, wc, bus);
 
       if (errorCode != 0) {
-        ui->invoke_setError(BuErrorStr(errorCode));
+        ui->invoke_setError(BC::getStatus(errorCode).c_str());
       }
     }
   });
