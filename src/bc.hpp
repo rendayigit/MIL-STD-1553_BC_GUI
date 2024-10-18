@@ -5,8 +5,6 @@
 #include <array>
 #include <string>
 
-static S16BIT wDisplaySelection = 0x0002;   /* Decoded */
-
 class BC {
 public:
   BC();
@@ -18,6 +16,7 @@ public:
   int rtToBc(int rt, int sa, int wc, U8BIT bus);
 
 private:
+  U16BIT messageBuffer[32];
   S16BIT m_devNum;
 };
 
