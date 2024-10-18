@@ -1,36 +1,76 @@
 #include "bc.hpp"
+#include "bc.h"
+#include "bcx.h"
 #include <iostream>
-#include <stdace.h>
+
+constexpr int MSG_ID = 1;
+constexpr int DATA_BLK_ID = 2;
+
+constexpr int OP_CODE_1 = 1;
+constexpr int OP_CODE_2 = 2;
+
+constexpr int MNR_FRAME = 1;
+constexpr int MJR_FRAME = 2;
 
 BC::BC() : m_devNum(0x0000) {}
 
-BC::~BC() {
-  // Must call at end of ACE library use
-  BuClose();
-}
+BC::~BC() { aceFree(m_devNum); }
 
 int BC::startBc(S16BIT devNum) {
-  BuConf_t Conf; // ACE library configuration type
-  BuError_t Err; // ACE library error status type
+  S16BIT Err;
 
-  Conf.ConfDev = devNum;
-  
-  Err = BuOpenLinux(&Conf);
+  m_devNum = devNum;
 
-  if (Err) {
-    return Err;
-  }
-
-  // Opens bus controller mode
-  Err = BuBCOpen();
+  Err = aceInitialize(m_devNum, ACE_ACCESS_CARD, ACE_MODE_BC, 0, 0, 0);
 
   if (Err) {
     return Err;
   }
 
-  // set response timeout to 50.5 us
-  Err = BuTimeout(RESPONSE_505);
+  U16BIT initialBuffer[32] = {0x0000};
 
+  // Create data block
+  Err = aceBCDataBlkCreate(m_devNum, DATA_BLK_ID, 32, initialBuffer, 32);
+
+  if (Err) {
+    return Err;
+  }
+
+  // Create message block
+  Err = aceBCMsgCreateBCtoRT(m_devNum, MSG_ID, DATA_BLK_ID, 0, 0, 0, 0,
+                             ACE_BCCTRL_CHL_A);
+  if (Err) {
+    return Err;
+  }
+
+  // Create XEQ opcode that will use msg block
+  Err = aceBCOpCodeCreate(m_devNum, OP_CODE_1, ACE_OPCODE_XEQ,
+                          ACE_CNDTST_ALWAYS, MSG_ID, 0, 0);
+  if (Err) {
+    return Err;
+  }
+
+  // Create CAL opcode that will call mnr frame from major
+  Err = aceBCOpCodeCreate(m_devNum, OP_CODE_2, ACE_OPCODE_CAL,
+                          ACE_CNDTST_ALWAYS, MNR_FRAME, 0, 0);
+  if (Err) {
+    return Err;
+  }
+
+  S16BIT aOpCodes[10] = {0x0000};
+
+  // Create Minor Frame
+  aOpCodes[0] = OP_CODE_1;
+  Err =
+      aceBCFrameCreate(m_devNum, MNR_FRAME, ACE_FRAME_MINOR, aOpCodes, 1, 0, 0);
+  if (Err) {
+    return Err;
+  }
+
+  // Create Major Frame
+  aOpCodes[0] = OP_CODE_2;
+  Err = aceBCFrameCreate(m_devNum, MJR_FRAME, ACE_FRAME_MAJOR, aOpCodes, 1,
+                         1000, 0);
   if (Err) {
     return Err;
   }
@@ -39,10 +79,9 @@ int BC::startBc(S16BIT devNum) {
 }
 
 int BC::stopBc() {
-  BuError_t Err;
+  S16BIT Err;
 
-  // Closes bus controller mode
-  Err = BuBCClose();
+  Err = aceBCStop(m_devNum);
 
   if (Err) {
     return Err;
@@ -51,116 +90,41 @@ int BC::stopBc() {
   return 0;
 }
 
-int BC::bcToRt(int rt, int sa, int wc, BUS bus,
+int BC::bcToRt(int rt, int sa, int wc, U8BIT bus,
                std::array<std::string, 32> data) {
-  BCMsgHandle msg;
-  U16BIT hexData[32];
+  S16BIT Err;
 
+  stopBc();
+
+  Err = aceBCMsgModifyBCtoRT(m_devNum, MSG_ID, DATA_BLK_ID, rt, sa, wc, 0, bus,
+                             0x000F);
+  if (Err) {
+    return Err;
+  }
+
+  // Convert string array to unsigned short array
   for (int i = 0; i < 32; ++i) {
-    // Convert string to unsigned short
-    hexData[i] =
+    messageBuffer[i] =
         static_cast<unsigned short>(strtoul(data.at(i).c_str(), nullptr, 16));
   }
 
-  msg = BuBCXBCtoRT((U8BIT)rt, (U8BIT)sa, (U8BIT)wc, (U8BIT)bus, hexData,
-                    BU_BCNOGAP, BU_BCALWAYS);
-
-  int transmitStatus = transmit(msg);
-  return transmitStatus;
-}
-
-int BC::rtToBc(int rt, int sa, int wc, BUS bus) {
-  BCMsgHandle msg;
-  msg = BuBCXRTtoBC((U8BIT)rt, (U8BIT)sa, (U8BIT)wc, (U8BIT)bus, BU_BCNOGAP,
-                    BU_BCALWAYS);
-
-  int transmitStatus = transmit(msg);
-  return transmitStatus;
-}
-
-int BC::transmit(BCMsgHandle msg) {
-  BuError_t Err;
-
-  // Minor frame handle
-  BCMinorFrmHandle myframe;
-
-  // Create minor frame
-  myframe = BuBCXMinorFrm(30000l, 1, &msg);
-
-  // load minor frame into ACE stack
-  Err = BuBCLoadMinor(BU_BCFRMBUFA, myframe);
-
+  Err = aceBCDataBlkWrite(m_devNum, DATA_BLK_ID, messageBuffer, 32, 0);
   if (Err) {
     return Err;
   }
 
-  // Run frame
-  Err = BuBCRunMinor(BU_BCFRMBUFA, BU_BCSINGLE);
-
+  // Start BC
+  int repeatCount = 1; // Set to -1 for infinite
+  Err = aceBCStart(m_devNum, MJR_FRAME, repeatCount);
   if (Err) {
     return Err;
   }
 
-  while (BuBCIsFrmActive())
-    ;
-
-  displayResult(myframe);
-
   return 0;
 }
 
-int BC::displayResult(BCMinorFrmHandle minorFrameHandle) {
-  // Holds message result read from frame
-  MsgType readmsg;
+// TODO: implement
+int BC::rtToBc(int rt, int sa, int wc, U8BIT bus) { return 0; }
 
-  // Display data
-  if (BuBCReadMsgNum(minorFrameHandle, 0, &readmsg)) {
-    printf("error reading message result\n");
-  } else {
-    U16BIT i;
-
-    printf("Message Type = %s", BuMsgTypeStr(0xFF)); // Freadmsg.Type));
-
-    if (readmsg.BlockStatus & MT_ERR)
-      printf(" (EXCEPTION)\n");
-    else
-      printf("\n");
-
-    printf(" Cmd1 %04X %s\n", readmsg.CmdWord1, BuCmdStr(readmsg.CmdWord1));
-
-    if (readmsg.CmdWord2flag) {
-      printf(" Cmd2 %04X %s\n", readmsg.CmdWord2, BuCmdStr(readmsg.CmdWord2));
-    }
-
-    printf(" Time %u uS\n", readmsg.TimeTag * 2); // 2us resolution
-    printf(" GapT %u uS\n", readmsg.GapTime);     // 1us resolution
-    printf(" BSW  %04X %s\n", readmsg.BlockStatus,
-           BuBCBSWErrorStr(readmsg.BlockStatus));
-    printf(" Ctrl %04X \n", readmsg.ControlWord);
-
-    for (i = 0; i < readmsg.DataLength; ++i) {
-      if (i == 0)
-        printf(" Data ");
-
-      printf("%04X  ", readmsg.Data[i]);
-
-      if ((i % 6) == 5)
-        printf("\n      ");
-    }
-
-    if (readmsg.Status1flag)
-      printf("\n Sta1 %04X", readmsg.Status1);
-
-    if (readmsg.Status2flag)
-      printf("\n Sta2 %04X", readmsg.Status2);
-
-    if (readmsg.LoopBack1flag)
-      printf("\n Lpb1 %04X", readmsg.LoopBack1);
-    if (readmsg.LoopBack2flag)
-      printf("\n Lpb2 %04X", readmsg.LoopBack2);
-
-    printf("\n\n");
-  }
-
-  return 0;
-}
+// TODO: implement
+int BC::rtToRt(int rt, int sa, int wc, U8BIT bus) { return 0; }

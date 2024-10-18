@@ -14,13 +14,10 @@ add_executable(bc-gui
 
 target_link_libraries(bc-gui PRIVATE 
     Slint::Slint
-    ${CMAKE_SOURCE_DIR}/deps/ddc-driver/lib/libace.a -no-pie
-    ${CMAKE_SOURCE_DIR}/deps/ddc-driver/lib/libemacepl.a
-    ${CMAKE_SOURCE_DIR}/deps/ddc-driver/obj/ddc_os_lib_util.o)
+    ${CMAKE_SOURCE_DIR}/deps/ddc-driver/lib/libemacepl.a)
 
 slint_target_sources(bc-gui ui/app-window.slint)
 
 target_include_directories(bc-gui PUBLIC ${INCLUDEDIRS}
     ${CMAKE_SOURCE_DIR}/deps/ddc-driver/include/emacepl
-    ${CMAKE_SOURCE_DIR}/deps/ddc-driver/include/ddcacex
-    ${CMAKE_SOURCE_DIR}/deps/ddc-driver/include/ace)
+    ${CMAKE_SOURCE_DIR}/deps/ddc-driver/include/ddcacex)

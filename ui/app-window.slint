@@ -27,13 +27,15 @@ export component AppWindow inherits Window {
         errorText.text = errorMsg;
     }
 
-    public function setStatus(statusMsg: string) {
-        errorText.color = Colors.green;
-        errorText.text = statusMsg;
-    }
-
-    public function setTime(time: string) {
-        timeText.text = time;
+    public function setConnectStatus(status: bool) {
+        if (status) {
+            errorText.color = Colors.green;
+            errorText.text = "Connected to device " + guiGlobals.device;
+            sendButton.enabled = true;
+        } else {
+            // Failure status message set by setError
+            sendButton.enabled = false;
+        }
     }
 
     init => {
@@ -43,7 +45,7 @@ export component AppWindow inherits Window {
     VerticalLayout {
         HorizontalLayout {
             HorizontalLayout {
-                padding: 25px;
+                padding: 15px;
                 spacing: 10px;
                 alignment: start;
 
@@ -55,6 +57,7 @@ export component AppWindow inherits Window {
                 }
 
                 device-box := Word-Box {
+                    width: 65px;
                     text: "0000";
                 }
 
@@ -69,35 +72,23 @@ export component AppWindow inherits Window {
             }
 
             HorizontalLayout {
-                padding: 25px;
+                padding: 15px;
+                spacing: 10px;
                 alignment: end;
 
-                bcToRtCheckBox := CheckBox {
-                    text: "BC to RT";
-                    checked: true;
-                    toggled => {
-                        rtToBcCheckBox.checked = !self.checked;
-
-                        if (bcToRtCheckBox.checked) {
-                            commandType = 0;
-                        }
+                ComboBox {
+                    current-value: "BC → RT";
+                    width: 125px;
+                    model: ["BC → RT", "RT → BC", "RT → RT"];
+                    selected => {
+                        commandType = self.current-index;
                     }
                 }
 
-                rtToBcCheckBox := CheckBox {
-                    text: "RT to BC";
-                    toggled => {
-                        bcToRtCheckBox.checked = !self.checked;
-
-                        if (rtToBcCheckBox.checked) {
-                            commandType = 1;
-                        }
-                    }
-                }
-
-                Button {
+                sendButton := Button {
                     text: "Send";
                     primary: true;
+                    enabled: false;
                     clicked => {
                         guiGlobals.bus = busComboBox.current-value;
                         guiGlobals.rt = rt-ComboBox.current-value.to-float();
@@ -144,7 +135,7 @@ export component AppWindow inherits Window {
         }
 
         HorizontalLayout {
-            padding: 25px;
+            padding: 15px;
             alignment: center;
 
             Text {
@@ -185,14 +176,19 @@ export component AppWindow inherits Window {
                 horizontal-alignment: center;
             }
 
-            wc-ComboBox := Rt-Sa-Wc-ComboBox {
-                current-value: 32;
-            }
+            wc-ComboBox := Rt-Sa-Wc-ComboBox { }
         }
 
         GridLayout {
             padding: 15px;
             spacing: 15px;
+
+            Text {
+                horizontal-alignment: left;
+                text: "Data:";
+                font-size: 20px;
+            }
+
             Row {
                 word0 := Word-Box {
                     text: "0000";
@@ -336,12 +332,13 @@ export component AppWindow inherits Window {
             padding-right: 10px;
 
             errorText := Text {
+                text: "Ready, press connect";
                 color: green;
             }
 
-            timeText := Text {
+            Text {
                 horizontal-alignment: right;
-                text: "0";
+                text: "v1.0";
             }
         }
     }

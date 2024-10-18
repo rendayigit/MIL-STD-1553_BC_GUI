@@ -1,11 +1,9 @@
 #ifndef BC_HPP
 #define BC_HPP
 
-#include "stdace.h"
+#include "stdemace.h"
 #include <array>
 #include <string>
-
-enum class BUS { A = 0x0080, B = 0x0000 };
 
 class BC {
 public:
@@ -14,13 +12,12 @@ public:
 
   int startBc(S16BIT devNum);
   int stopBc();
-  int bcToRt(int rt, int sa, int wc, BUS bus, std::array<std::string, 32> data);
-  int rtToBc(int rt, int sa, int wc, BUS bus);
+  int bcToRt(int rt, int sa, int wc, U8BIT bus, std::array<std::string, 32> data);
+  int rtToBc(int rt, int sa, int wc, U8BIT bus);
+  int rtToRt(int rt, int sa, int wc, U8BIT bus);
 
 private:
-  int transmit(BCMsgHandle msg);
-  int displayResult(BCMinorFrmHandle minorFrameHandle);
-
+  U16BIT messageBuffer[32];
   S16BIT m_devNum;
 };
 
