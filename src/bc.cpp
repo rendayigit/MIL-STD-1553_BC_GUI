@@ -1,5 +1,6 @@
 #include "bc.hpp"
 #include "bc.h"
+#include "bcx.h"
 #include <iostream>
 
 constexpr int MSG_ID = 1;
@@ -96,7 +97,7 @@ int BC::bcToRt(int rt, int sa, int wc, U8BIT bus,
   stopBc();
 
   Err = aceBCMsgModifyBCtoRT(m_devNum, MSG_ID, DATA_BLK_ID, rt, sa, wc, 0,
-                             ACE_BCCTRL_CHL_A, 0x000F);
+                             bus, 0x000F);
   if (Err) {
     return Err;
   }
