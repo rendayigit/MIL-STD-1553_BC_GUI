@@ -1,6 +1,7 @@
 #include "app-window.h"
 #include "bc.hpp"
 #include "common.hpp"
+#include "config.h"
 #include <chrono>
 #include <ctime>
 #include <iomanip>
@@ -58,10 +59,12 @@ int main(int argc, char **argv) {
     U8BIT deviceNum = static_cast<unsigned short>(
         strtoul(ui->global<guiGlobals>().get_device().data(), nullptr, 16));
 
+    aceFree(deviceNum);
     errorCode = bc.startBc(deviceNum);
     if (errorCode == 0) {
-      ui->invoke_setStatus("✅");
+      ui->invoke_setConnectStatus(true);
     } else {
+      ui->invoke_setConnectStatus(false);
       ui->invoke_setError(getStatus(errorCode).c_str());
     }
   });

@@ -27,9 +27,15 @@ export component AppWindow inherits Window {
         errorText.text = errorMsg;
     }
 
-    public function setStatus(statusMsg: string) {
-        errorText.color = Colors.green;
-        errorText.text = statusMsg;
+    public function setConnectStatus(status: bool) {
+        if(status) {
+            errorText.color = Colors.green;
+            errorText.text = "Connected to device " + guiGlobals.device;
+            sendButton.enabled = true;
+        } else {
+            // Failure status message set by setError
+            sendButton.enabled = false;
+        }
     }
 
     public function setTime(time: string) {
@@ -95,9 +101,10 @@ export component AppWindow inherits Window {
                     }
                 }
 
-                Button {
+                sendButton := Button {
                     text: "Send";
                     primary: true;
+                    enabled: false;
                     clicked => {
                         guiGlobals.bus = busComboBox.current-value;
                         guiGlobals.rt = rt-ComboBox.current-value.to-float();
@@ -334,6 +341,7 @@ export component AppWindow inherits Window {
             padding-right: 10px;
 
             errorText := Text {
+                text: "Ready, press connect";
                 color: green;
             }
 
