@@ -28,7 +28,7 @@ export component AppWindow inherits Window {
     }
 
     public function setConnectStatus(status: bool) {
-        if(status) {
+        if (status) {
             errorText.color = Colors.green;
             errorText.text = "Connected to device " + guiGlobals.device;
             sendButton.enabled = true;
@@ -36,10 +36,6 @@ export component AppWindow inherits Window {
             // Failure status message set by setError
             sendButton.enabled = false;
         }
-    }
-
-    public function setTime(time: string) {
-        timeText.text = time;
     }
 
     init => {
@@ -76,28 +72,15 @@ export component AppWindow inherits Window {
 
             HorizontalLayout {
                 padding: 25px;
+                spacing: 10px;
                 alignment: end;
 
-                bcToRtCheckBox := CheckBox {
-                    text: "BC to RT";
-                    checked: true;
-                    toggled => {
-                        rtToBcCheckBox.checked = !self.checked;
-
-                        if (bcToRtCheckBox.checked) {
-                            commandType = 0;
-                        }
-                    }
-                }
-
-                rtToBcCheckBox := CheckBox {
-                    text: "RT to BC";
-                    toggled => {
-                        bcToRtCheckBox.checked = !self.checked;
-
-                        if (rtToBcCheckBox.checked) {
-                            commandType = 1;
-                        }
+                ComboBox {
+                    current-value: "BC → RT";
+                    width: 125px;
+                    model: ["BC → RT", "RT → BC", "RT → RT"];
+                    selected => {
+                        commandType = self.current-index;
                     }
                 }
 
@@ -345,9 +328,9 @@ export component AppWindow inherits Window {
                 color: green;
             }
 
-            timeText := Text {
+            Text {
                 horizontal-alignment: right;
-                text: "0";
+                text: "v1.0";
             }
         }
     }

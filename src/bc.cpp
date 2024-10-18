@@ -96,8 +96,8 @@ int BC::bcToRt(int rt, int sa, int wc, U8BIT bus,
 
   stopBc();
 
-  Err = aceBCMsgModifyBCtoRT(m_devNum, MSG_ID, DATA_BLK_ID, rt, sa, wc, 0,
-                             bus, 0x000F);
+  Err = aceBCMsgModifyBCtoRT(m_devNum, MSG_ID, DATA_BLK_ID, rt, sa, wc, 0, bus,
+                             0x000F);
   if (Err) {
     return Err;
   }
@@ -123,4 +123,8 @@ int BC::bcToRt(int rt, int sa, int wc, U8BIT bus,
   return 0;
 }
 
+// TODO: implement
 int BC::rtToBc(int rt, int sa, int wc, U8BIT bus) { return 0; }
+
+// TODO: implement
+int BC::rtToRt(int rt, int sa, int wc, U8BIT bus) { return 0; }
