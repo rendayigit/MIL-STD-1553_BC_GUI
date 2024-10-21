@@ -88,19 +88,16 @@ export component AppWindow inherits Window {
                             rt-text-1.text = "  RT Tx: ";
                             sa-text-1.text = "  SA Tx: ";
 
-                            rx-rt-sa-layout.visible = true;
+                            rx-rt-sa-layout.opacity = 100%;
                             root.height += 40px;
                             rx-rt-sa-layout.height = 40px;
-
-                            rt-text-2.text = "  RT Rx: ";
-                            sa-text-2.text = "  SA Rx: ";
                         } else {
                             rt-text-1.text = "  RT: ";
                             sa-text-1.text = "  SA: ";
 
                             root.height -= rx-rt-sa-layout.height;
                             rx-rt-sa-layout.height = 0px;
-                            rx-rt-sa-layout.visible = false;
+                            rx-rt-sa-layout.opacity = 0%;
                         }
                     }
                 }
@@ -203,15 +200,14 @@ export component AppWindow inherits Window {
 
         rx-rt-sa-layout := HorizontalLayout {
             alignment: center;
+            padding-left: 3px;
             height: 0px;
-            visible: false;
+            opacity: 0%;
 
-            animate height {
-                duration: 500ms;
-           }
+            animate height, opacity { duration: 300ms; }
 
-            rt-text-2 := Text {
-                text: "  RT: ";
+            Text {
+                text: "RT Rx: ";
                 font-size: 30px;
                 vertical-alignment: center;
                 horizontal-alignment: center;
@@ -219,8 +215,8 @@ export component AppWindow inherits Window {
 
             rt-ComboBox-2 := Rt-Sa-Wc-ComboBox { }
 
-            sa-text-2 := Text {
-                text: "  SA: ";
+            Text {
+                text: "  SA Rx: ";
                 font-size: 30px;
                 vertical-alignment: center;
                 horizontal-alignment: center;
