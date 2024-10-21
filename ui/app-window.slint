@@ -4,6 +4,7 @@ import { Word-Box } from "word-box.slint";
 
 export global guiGlobals {
     in property <string> device;
+    in property <bool> is-repeat: false;
     in property <int> rt;
     in property <int> sa;
     in property <int> rt-rx;
@@ -22,6 +23,7 @@ export component AppWindow inherits Window {
     property <int> commandType: 0; // Bc->RT: 0, RT->BC:1, RT->RT:2
     callback connectPressed();
     callback sendPressed(int);
+    callback stopPressed();
 
     public function setError(errorMsg: string) {
         errorText.color = Colors.red;
@@ -76,6 +78,37 @@ export component AppWindow inherits Window {
                 padding: 15px;
                 spacing: 10px;
                 alignment: end;
+
+                Rectangle {
+                    background: guiGlobals.is-repeat && repeat-toggle-touch.has-hover ? Palette.accent-background.darker(30%) : // on and hover
+                    (guiGlobals.is-repeat && !repeat-toggle-touch.has-hover) ? Palette.accent-background : // on and no hover
+                    (!guiGlobals.is-repeat && repeat-toggle-touch.has-hover) ? Palette.alternate-background.darker(-30%) : // off and hover
+                    (!guiGlobals.is-repeat && !repeat-toggle-touch.has-hover) ? Palette.alternate-background : black; // off and no hover
+
+                    width: 40px;
+                    height: 40px;
+                    border-radius: 10px;
+
+                    Text {
+                        vertical-alignment: center;
+                        horizontal-alignment: center;
+                        height: 100%;
+                        width: 100%;
+                        text: "⟳";
+                        font-size: 25px;
+                        color: guiGlobals.is-repeat ? black : white;
+                    }
+
+                    repeat-toggle-touch := TouchArea {
+                        clicked => {
+                            guiGlobals.is-repeat = !guiGlobals.is-repeat;
+
+                            if (!guiGlobals.is-repeat) {
+                                stopPressed();
+                            }
+                        }
+                    }
+                }
 
                 ComboBox {
                     current-value: "BC → RT";

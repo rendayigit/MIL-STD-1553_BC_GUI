@@ -162,7 +162,7 @@ int BC::stopBc() {
 }
 
 int BC::bcToRt(int rt, int sa, int wc, U8BIT bus,
-               std::array<std::string, 32> data) {
+               std::array<std::string, 32> data, bool isRepeat) {
   S16BIT Err;
 
   stopBc();
@@ -184,8 +184,13 @@ int BC::bcToRt(int rt, int sa, int wc, U8BIT bus,
     return Err;
   }
 
+  int repeatCount = 1;
+
+  if (isRepeat) {
+    repeatCount = -1;
+  }
+
   // Start BC
-  int repeatCount = 1; // Set to -1 for infinite
   Err = aceBCStart(m_devNum, MJR_FRAME_1, repeatCount);
   if (Err) {
     return Err;
@@ -194,7 +199,7 @@ int BC::bcToRt(int rt, int sa, int wc, U8BIT bus,
   return 0;
 }
 
-int BC::rtToBc(int rt, int sa, int wc, U8BIT bus) {
+int BC::rtToBc(int rt, int sa, int wc, U8BIT bus, bool isRepeat) {
   S16BIT Err;
 
   stopBc();
@@ -210,8 +215,13 @@ int BC::rtToBc(int rt, int sa, int wc, U8BIT bus) {
     return Err;
   }
 
+  int repeatCount = 1;
+
+  if (isRepeat) {
+    repeatCount = -1;
+  }
+
   // Start BC
-  int repeatCount = 1; // Set to -1 for infinite
   Err = aceBCStart(m_devNum, MJR_FRAME_2, repeatCount);
   if (Err) {
     return Err;
@@ -220,7 +230,8 @@ int BC::rtToBc(int rt, int sa, int wc, U8BIT bus) {
   return 0;
 }
 
-int BC::rtToRt(int rt_tx, int sa_tx, int rt_rx, int sa_rx, int wc, U8BIT bus) {
+int BC::rtToRt(int rt_tx, int sa_tx, int rt_rx, int sa_rx, int wc, U8BIT bus,
+               bool isRepeat) {
   S16BIT Err;
 
   stopBc();
@@ -237,8 +248,13 @@ int BC::rtToRt(int rt_tx, int sa_tx, int rt_rx, int sa_rx, int wc, U8BIT bus) {
     return Err;
   }
 
+  int repeatCount = 1;
+
+  if (isRepeat) {
+    repeatCount = -1;
+  }
+
   // Start BC
-  int repeatCount = 1; // Set to -1 for infinite
   Err = aceBCStart(m_devNum, MJR_FRAME_3, repeatCount);
   if (Err) {
     return Err;
