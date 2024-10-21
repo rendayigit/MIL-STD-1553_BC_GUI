@@ -32,6 +32,7 @@ int main(int argc, char **argv) {
     int wc = ui->global<guiGlobals>().get_wc();
     slint::SharedString busString = ui->global<guiGlobals>().get_bus();
     int bus = busString == "A" ? ACE_BCCTRL_CHL_A : ACE_BCCTRL_CHL_B;
+    bool isRepeat = ui->global<guiGlobals>().get_is_repeat();
 
     std::array<std::string, 32> data;
 
@@ -41,17 +42,19 @@ int main(int argc, char **argv) {
     }
 
     if (commandType == 0) {
-      errorCode = bc.bcToRt(rt, sa, wc, bus, data);
+      errorCode = bc.bcToRt(rt, sa, wc, bus, data, isRepeat);
     } else if (commandType == 1) {
-      errorCode = bc.rtToBc(rt, sa, wc, bus);
+      errorCode = bc.rtToBc(rt, sa, wc, bus, isRepeat);
     } else if (commandType == 2) {
-      errorCode = bc.rtToRt(rt, sa, rt_rx, sa_rx, wc, bus);
+      errorCode = bc.rtToRt(rt, sa, rt_rx, sa_rx, wc, bus, isRepeat);
     }
 
     if (errorCode != 0) {
       ui->invoke_setError(getStatus(errorCode).c_str());
     }
   });
+
+  ui->on_stopPressed([&] { bc.stopBc(); });
 
   ui->run();
   return 0;
