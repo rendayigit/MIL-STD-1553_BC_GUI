@@ -6,17 +6,18 @@ export global guiGlobals {
     in property <string> device;
     in property <int> rt;
     in property <int> sa;
+    in property <int> rt-rx;
+    in property <int> sa-rx;
     in property <int> wc;
     in property <string> bus;
     in property <[string]> words;
 }
 
 export component AppWindow inherits Window {
-    min-width: 700px;
-    preferred-width: 700px;
+    title: "MIL-STD-1553 Bus Controller";
 
+    min-width: 800px;
     min-height: 400px;
-    preferred-height: 400px;
 
     property <int> commandType: 0; // Bc->RT: 0, RT->BC:1, RT->RT:2
     callback connectPressed();
@@ -82,6 +83,22 @@ export component AppWindow inherits Window {
                     model: ["BC → RT", "RT → BC", "RT → RT"];
                     selected => {
                         commandType = self.current-index;
+
+                        if (self.current-value == "RT → RT") {
+                            rt-text-1.text = "  RT Tx: ";
+                            sa-text-1.text = "  SA Tx: ";
+
+                            rx-rt-sa-layout.opacity = 100%;
+                            root.height += 40px;
+                            rx-rt-sa-layout.height = 40px;
+                        } else {
+                            rt-text-1.text = "  RT: ";
+                            sa-text-1.text = "  SA: ";
+
+                            root.height -= rx-rt-sa-layout.height;
+                            rx-rt-sa-layout.height = 0px;
+                            rx-rt-sa-layout.opacity = 0%;
+                        }
                     }
                 }
 
@@ -93,6 +110,8 @@ export component AppWindow inherits Window {
                         guiGlobals.bus = busComboBox.current-value;
                         guiGlobals.rt = rt-ComboBox.current-value.to-float();
                         guiGlobals.sa = sa-ComboBox.current-value.to-float();
+                        guiGlobals.rt-rx = rt-ComboBox-2.current-value.to-float();
+                        guiGlobals.sa-rx = sa-ComboBox-2.current-value.to-float();
                         guiGlobals.wc = wc-ComboBox.current-value.to-float();
                         guiGlobals.words = [
                             "0x" + word0.text,
@@ -151,7 +170,7 @@ export component AppWindow inherits Window {
                 model: ["A", "B"];
             }
 
-            Text {
+            rt-text-1 := Text {
                 text: "  RT: ";
                 font-size: 30px;
                 vertical-alignment: center;
@@ -160,7 +179,7 @@ export component AppWindow inherits Window {
 
             rt-ComboBox := Rt-Sa-Wc-ComboBox { }
 
-            Text {
+            sa-text-1 := Text {
                 text: "  SA: ";
                 font-size: 30px;
                 vertical-alignment: center;
@@ -179,12 +198,40 @@ export component AppWindow inherits Window {
             wc-ComboBox := Rt-Sa-Wc-ComboBox { }
         }
 
+        rx-rt-sa-layout := HorizontalLayout {
+            alignment: center;
+            padding-left: 3px;
+            height: 0px;
+            opacity: 0%;
+
+            animate height, opacity { duration: 300ms; }
+
+            Text {
+                text: "RT Rx: ";
+                font-size: 30px;
+                vertical-alignment: center;
+                horizontal-alignment: center;
+            }
+
+            rt-ComboBox-2 := Rt-Sa-Wc-ComboBox { }
+
+            Text {
+                text: "  SA Rx: ";
+                font-size: 30px;
+                vertical-alignment: center;
+                horizontal-alignment: center;
+            }
+
+            sa-ComboBox-2 := Rt-Sa-Wc-ComboBox { }
+        }
+
         GridLayout {
             padding: 15px;
             spacing: 15px;
 
             Text {
                 horizontal-alignment: left;
+                vertical-alignment: bottom;
                 text: "Data:";
                 font-size: 20px;
             }
