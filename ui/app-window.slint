@@ -14,11 +14,10 @@ export global guiGlobals {
 }
 
 export component AppWindow inherits Window {
-    min-width: 700px;
-    preferred-width: 700px;
+    title: "MIL-STD-1553 Bus Controller";
 
+    min-width: 800px;
     min-height: 400px;
-    preferred-height: 400px;
 
     property <int> commandType: 0; // Bc->RT: 0, RT->BC:1, RT->RT:2
     callback connectPressed();
@@ -99,9 +98,9 @@ export component AppWindow inherits Window {
                             rt-text-1.text = "  RT: ";
                             sa-text-1.text = "  SA: ";
 
-                            rx-rt-sa-layout.visible = false;
                             root.height -= rx-rt-sa-layout.height;
                             rx-rt-sa-layout.height = 0px;
+                            rx-rt-sa-layout.visible = false;
                         }
                     }
                 }
@@ -207,6 +206,10 @@ export component AppWindow inherits Window {
             height: 0px;
             visible: false;
 
+            animate height {
+                duration: 500ms;
+           }
+
             rt-text-2 := Text {
                 text: "  RT: ";
                 font-size: 30px;
@@ -232,6 +235,7 @@ export component AppWindow inherits Window {
 
             Text {
                 horizontal-alignment: left;
+                vertical-alignment: bottom;
                 text: "Data:";
                 font-size: 20px;
             }
