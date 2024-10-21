@@ -14,11 +14,13 @@ constexpr int DATA_BLK_RT_TO_RT_ID = 6;
 constexpr int OP_CODE_1 = 1;
 constexpr int OP_CODE_2 = 2;
 constexpr int OP_CODE_3 = 3;
+constexpr int OP_CODE_4 = 4;
 
 constexpr int MNR_FRAME = 1;
 
 constexpr int MJR_FRAME_1 = 2;
 constexpr int MJR_FRAME_2 = 3;
+constexpr int MJR_FRAME_3 = 4;
 
 BC::BC() : m_devNum(0x0000) {}
 
@@ -53,6 +55,14 @@ int BC::startBc(S16BIT devNum) {
     return Err;
   }
 
+  // Create RT -> RT data block
+  Err =
+      aceBCDataBlkCreate(m_devNum, DATA_BLK_RT_TO_RT_ID, 32, initialBuffer, 32);
+
+  if (Err) {
+    return Err;
+  }
+
   // Create BC -> RT message block
   Err = aceBCMsgCreateBCtoRT(m_devNum, MSG_BC_TO_RT_ID, DATA_BLK_BC_TO_RT_ID, 0,
                              0, 0, 0, ACE_BCCTRL_CHL_A);
@@ -67,6 +77,13 @@ int BC::startBc(S16BIT devNum) {
     return Err;
   }
 
+  // Create RT -> RT message block
+  Err = aceBCMsgCreateRTtoRT(m_devNum, MSG_RT_TO_RT_ID, DATA_BLK_RT_TO_RT_ID, 0,
+                             0, 0, 0, 0, 0, ACE_BCCTRL_CHL_A);
+  if (Err) {
+    return Err;
+  }
+
   // Create XEQ opcode that will use BC -> RT msg block
   Err = aceBCOpCodeCreate(m_devNum, OP_CODE_1, ACE_OPCODE_XEQ,
                           ACE_CNDTST_ALWAYS, MSG_BC_TO_RT_ID, 0, 0);
@@ -77,6 +94,13 @@ int BC::startBc(S16BIT devNum) {
   // Create XEQ opcode that will use RT -> BC msg block
   Err = aceBCOpCodeCreate(m_devNum, OP_CODE_3, ACE_OPCODE_XEQ,
                           ACE_CNDTST_ALWAYS, MSG_RT_TO_BC_ID, 0, 0);
+  if (Err) {
+    return Err;
+  }
+
+  // Create XEQ opcode that will use RT -> RT msg block
+  Err = aceBCOpCodeCreate(m_devNum, OP_CODE_4, ACE_OPCODE_XEQ,
+                          ACE_CNDTST_ALWAYS, MSG_RT_TO_RT_ID, 0, 0);
   if (Err) {
     return Err;
   }
@@ -109,6 +133,14 @@ int BC::startBc(S16BIT devNum) {
   // Create RT -> BC Major Frame
   aOpCodes[0] = OP_CODE_3;
   Err = aceBCFrameCreate(m_devNum, MJR_FRAME_2, ACE_FRAME_MAJOR, aOpCodes, 1,
+                         1000, 0);
+  if (Err) {
+    return Err;
+  }
+
+  // Create RT -> RT Major Frame
+  aOpCodes[0] = OP_CODE_4;
+  Err = aceBCFrameCreate(m_devNum, MJR_FRAME_3, ACE_FRAME_MAJOR, aOpCodes, 1,
                          1000, 0);
   if (Err) {
     return Err;
@@ -188,5 +220,29 @@ int BC::rtToBc(int rt, int sa, int wc, U8BIT bus) {
   return 0;
 }
 
-// TODO: implement
-int BC::rtToRt(int rt, int sa, int wc, U8BIT bus) { return 0; }
+int BC::rtToRt(int rt, int sa, int wc, U8BIT bus) {
+  S16BIT Err;
+
+  stopBc();
+
+  // TODO rt_tr, rt_rc, sa_tr, sa_rc
+  Err = aceBCMsgModifyRTtoRT(m_devNum, MSG_RT_TO_RT_ID, DATA_BLK_RT_TO_RT_ID,
+                             rt, sa, wc, rt + 1, sa + 1, 0, bus, 0x000F);
+  if (Err) {
+    return Err;
+  }
+
+  Err = aceBCDataBlkWrite(m_devNum, DATA_BLK_RT_TO_RT_ID, messageBuffer, 32, 0);
+  if (Err) {
+    return Err;
+  }
+
+  // Start BC
+  int repeatCount = 1; // Set to -1 for infinite
+  Err = aceBCStart(m_devNum, MJR_FRAME_3, repeatCount);
+  if (Err) {
+    return Err;
+  }
+
+  return 0;
+}
