@@ -220,14 +220,14 @@ int BC::rtToBc(int rt, int sa, int wc, U8BIT bus) {
   return 0;
 }
 
-int BC::rtToRt(int rt, int sa, int wc, U8BIT bus) {
+int BC::rtToRt(int rt_tx, int sa_tx, int rt_rx, int sa_rx, int wc, U8BIT bus) {
   S16BIT Err;
 
   stopBc();
 
   // TODO rt_tr, rt_rc, sa_tr, sa_rc
   Err = aceBCMsgModifyRTtoRT(m_devNum, MSG_RT_TO_RT_ID, DATA_BLK_RT_TO_RT_ID,
-                             rt, sa, wc, rt + 1, sa + 1, 0, bus, 0x000F);
+                             rt_rx, sa_rx, wc, rt_tx, sa_tx, 0, bus, 0x000F);
   if (Err) {
     return Err;
   }

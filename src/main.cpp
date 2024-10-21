@@ -27,6 +27,8 @@ int main(int argc, char **argv) {
   ui->on_sendPressed([&](int commandType) {
     int rt = ui->global<guiGlobals>().get_rt();
     int sa = ui->global<guiGlobals>().get_sa();
+    int rt_rx = ui->global<guiGlobals>().get_rt_rx();
+    int sa_rx = ui->global<guiGlobals>().get_sa_rx();
     int wc = ui->global<guiGlobals>().get_wc();
     slint::SharedString busString = ui->global<guiGlobals>().get_bus();
     int bus = busString == "A" ? ACE_BCCTRL_CHL_A : ACE_BCCTRL_CHL_B;
@@ -43,7 +45,7 @@ int main(int argc, char **argv) {
     } else if (commandType == 1) {
       errorCode = bc.rtToBc(rt, sa, wc, bus);
     } else if (commandType == 2) {
-      errorCode = bc.rtToRt(rt, sa, wc, bus);
+      errorCode = bc.rtToRt(rt, sa, rt_rx, sa_rx, wc, bus);
     }
 
     if (errorCode != 0) {

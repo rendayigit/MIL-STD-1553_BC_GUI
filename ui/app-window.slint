@@ -6,6 +6,8 @@ export global guiGlobals {
     in property <string> device;
     in property <int> rt;
     in property <int> sa;
+    in property <int> rt-rx;
+    in property <int> sa-rx;
     in property <int> wc;
     in property <string> bus;
     in property <[string]> words;
@@ -82,6 +84,25 @@ export component AppWindow inherits Window {
                     model: ["BC → RT", "RT → BC", "RT → RT"];
                     selected => {
                         commandType = self.current-index;
+
+                        if (self.current-value == "RT → RT") {
+                            rt-text-1.text = "  RT Tx: ";
+                            sa-text-1.text = "  SA Tx: ";
+
+                            rx-rt-sa-layout.visible = true;
+                            root.height += 40px;
+                            rx-rt-sa-layout.height = 40px;
+
+                            rt-text-2.text = "  RT Rx: ";
+                            sa-text-2.text = "  SA Rx: ";
+                        } else {
+                            rt-text-1.text = "  RT: ";
+                            sa-text-1.text = "  SA: ";
+
+                            rx-rt-sa-layout.visible = false;
+                            root.height -= rx-rt-sa-layout.height;
+                            rx-rt-sa-layout.height = 0px;
+                        }
                     }
                 }
 
@@ -93,6 +114,8 @@ export component AppWindow inherits Window {
                         guiGlobals.bus = busComboBox.current-value;
                         guiGlobals.rt = rt-ComboBox.current-value.to-float();
                         guiGlobals.sa = sa-ComboBox.current-value.to-float();
+                        guiGlobals.rt-rx = rt-ComboBox-2.current-value.to-float();
+                        guiGlobals.sa-rx = sa-ComboBox-2.current-value.to-float();
                         guiGlobals.wc = wc-ComboBox.current-value.to-float();
                         guiGlobals.words = [
                             "0x" + word0.text,
@@ -151,7 +174,7 @@ export component AppWindow inherits Window {
                 model: ["A", "B"];
             }
 
-            Text {
+            rt-text-1 := Text {
                 text: "  RT: ";
                 font-size: 30px;
                 vertical-alignment: center;
@@ -160,7 +183,7 @@ export component AppWindow inherits Window {
 
             rt-ComboBox := Rt-Sa-Wc-ComboBox { }
 
-            Text {
+            sa-text-1 := Text {
                 text: "  SA: ";
                 font-size: 30px;
                 vertical-alignment: center;
@@ -177,6 +200,30 @@ export component AppWindow inherits Window {
             }
 
             wc-ComboBox := Rt-Sa-Wc-ComboBox { }
+        }
+
+        rx-rt-sa-layout := HorizontalLayout {
+            alignment: center;
+            height: 0px;
+            visible: false;
+
+            rt-text-2 := Text {
+                text: "  RT: ";
+                font-size: 30px;
+                vertical-alignment: center;
+                horizontal-alignment: center;
+            }
+
+            rt-ComboBox-2 := Rt-Sa-Wc-ComboBox { }
+
+            sa-text-2 := Text {
+                text: "  SA: ";
+                font-size: 30px;
+                vertical-alignment: center;
+                horizontal-alignment: center;
+            }
+
+            sa-ComboBox-2 := Rt-Sa-Wc-ComboBox { }
         }
 
         GridLayout {
