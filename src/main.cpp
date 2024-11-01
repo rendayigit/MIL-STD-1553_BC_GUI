@@ -3,16 +3,15 @@
 #include "common.hpp"
 #include <string>
 
-int main(int argc, char **argv) {
-  int errorCode = 0;
+int main(int  /*argc*/, char ** /*argv*/) {
+  S16BIT errorCode = 0;
 
   auto ui = AppWindow::create();
 
   BC bc;
 
   ui->on_connectPressed([&] {
-    U8BIT deviceNum = static_cast<unsigned short>(
-        strtoul(ui->global<guiGlobals>().get_device().data(), nullptr, 16));
+    U8BIT deviceNum = static_cast<unsigned short>(strtoul(ui->global<guiGlobals>().get_device().data(), nullptr, HEX_BYTE));
 
     aceFree(deviceNum);
     errorCode = bc.startBc(deviceNum);
@@ -27,17 +26,16 @@ int main(int argc, char **argv) {
   ui->on_sendPressed([&](int commandType) {
     int rt = ui->global<guiGlobals>().get_rt();
     int sa = ui->global<guiGlobals>().get_sa();
-    int rt_rx = ui->global<guiGlobals>().get_rt_rx();
-    int sa_rx = ui->global<guiGlobals>().get_sa_rx();
+    int rtRx = ui->global<guiGlobals>().get_rt_rx();
+    int saRx = ui->global<guiGlobals>().get_sa_rx();
     int wc = ui->global<guiGlobals>().get_wc();
     slint::SharedString busString = ui->global<guiGlobals>().get_bus();
     int bus = busString == "A" ? ACE_BCCTRL_CHL_A : ACE_BCCTRL_CHL_B;
     bool isRepeat = ui->global<guiGlobals>().get_is_repeat();
 
-    std::array<std::string, 32> data;
+    std::array<std::string, RT_SA_MAX_COUNT> data;
 
-    for (int i = 0; i < ui->global<guiGlobals>().get_words()->row_count();
-         ++i) {
+    for (int i = 0; i < ui->global<guiGlobals>().get_words()->row_count(); ++i) {
       data.at(i) = ui->global<guiGlobals>().get_words()->row_data(i)->data();
     }
 
@@ -46,7 +44,7 @@ int main(int argc, char **argv) {
     } else if (commandType == 1) {
       errorCode = bc.rtToBc(rt, sa, wc, bus, isRepeat);
     } else if (commandType == 2) {
-      errorCode = bc.rtToRt(rt, sa, rt_rx, sa_rx, wc, bus, isRepeat);
+      errorCode = bc.rtToRt(rt, sa, rtRx, saRx, wc, bus, isRepeat);
     }
 
     if (errorCode != 0) {
