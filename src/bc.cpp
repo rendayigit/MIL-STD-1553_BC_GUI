@@ -2,7 +2,9 @@
 #include "common.hpp"
 #include "fileOperations/fileOperations.hpp"
 #include "json/json.hpp"
+
 #include <iostream>
+#include <string>
 
 constexpr int MOD_FLAGS = 0x000F;
 
@@ -37,7 +39,6 @@ BC::BC() : m_messageBuffer(), m_devNum(Json(CONFIG_PATH).getNode("DEFAULT_DEVICE
   // TODO(renda): read config.json and set ui bus controller mode here
   // TODO(renda): read config.json and set ui data here
   // TODO(renda): add feature to read multiple configs with multiple data sets to periodically transmit
-  // TODO(renda): log everything
 }
 
 BC::~BC() { aceFree(m_devNum); }
@@ -46,6 +47,8 @@ S16BIT BC::startBc(S16BIT devNum) {
   S16BIT err = 0;
 
   m_devNum = devNum;
+
+  m_logger.log(LOG_INFO, "start bc with dev: " + std::to_string(m_devNum));
 
   err = aceFree(m_devNum);
 
@@ -159,8 +162,10 @@ S16BIT BC::startBc(S16BIT devNum) {
   return 0;
 }
 
-S16BIT BC::stopBc() const {
+S16BIT BC::stopBc() {
   S16BIT err = 0;
+
+  m_logger.log(LOG_INFO, "stop bc with dev: " + std::to_string(m_devNum));
 
   err = aceBCStop(m_devNum);
 
@@ -173,6 +178,16 @@ S16BIT BC::stopBc() const {
 
 S16BIT BC::bcToRt(int rt, int sa, int wc, U8BIT bus, std::array<std::string, RT_SA_MAX_COUNT> data, bool isRepeat) {
   S16BIT err = 0;
+
+  std::string dataString;
+
+  for (auto &item : data) {
+    dataString += item;
+  }
+
+  m_logger.log(LOG_INFO, "bc->rt with dev: " + std::to_string(m_devNum) + " rt: " + std::to_string(rt) + " sa: " +
+                             std::to_string(sa) + " wc: " + std::to_string(wc) + "bus: " + std::to_string(bus) +
+                             " data: " + dataString + " is repeat: " + std::to_string(static_cast<int>(isRepeat)));
 
   stopBc();
 
@@ -210,6 +225,10 @@ S16BIT BC::bcToRt(int rt, int sa, int wc, U8BIT bus, std::array<std::string, RT_
 S16BIT BC::rtToBc(int rt, int sa, int wc, U8BIT bus, bool isRepeat) {
   S16BIT err = 0;
 
+  m_logger.log(LOG_INFO, "rt->bc with dev: " + std::to_string(m_devNum) + " rt: " + std::to_string(rt) + " sa: " +
+                             std::to_string(sa) + " wc: " + std::to_string(wc) + "bus: " + std::to_string(bus) +
+                             " is repeat: " + std::to_string(static_cast<int>(isRepeat)));
+
   stopBc();
 
   err = aceBCMsgModifyRTtoBC(m_devNum, MSG_RT_TO_BC_ID, DATA_BLK_RT_TO_BC_ID, rt, sa, wc, 0, bus, MOD_FLAGS);
@@ -239,6 +258,11 @@ S16BIT BC::rtToBc(int rt, int sa, int wc, U8BIT bus, bool isRepeat) {
 
 S16BIT BC::rtToRt(int rtTx, int saTx, int rtRx, int saRx, int wc, U8BIT bus, bool isRepeat) {
   S16BIT err = 0;
+
+  m_logger.log(LOG_INFO, "rt->rt with dev: " + std::to_string(m_devNum) + " rt tx: " + std::to_string(rtTx) +
+                             " sa tx: " + std::to_string(saTx) + " rt rx: " + std::to_string(rtRx) + " sa rx: " +
+                             std::to_string(saRx) + " wc: " + std::to_string(wc) + "bus: " + std::to_string(bus) +
+                             " is repeat: " + std::to_string(static_cast<int>(isRepeat)));
 
   stopBc();
 
