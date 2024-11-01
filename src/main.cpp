@@ -3,7 +3,7 @@
 #include "common.hpp"
 #include <string>
 
-int main(int  /*argc*/, char ** /*argv*/) {
+int main(int /*argc*/, char ** /*argv*/) {
   S16BIT errorCode = 0;
 
   auto ui = AppWindow::create();
@@ -11,15 +11,18 @@ int main(int  /*argc*/, char ** /*argv*/) {
   BC bc;
 
   ui->on_connectPressed([&] {
-    U8BIT deviceNum = static_cast<unsigned short>(strtoul(ui->global<guiGlobals>().get_device().data(), nullptr, HEX_BYTE));
+    U8BIT deviceNum =
+        static_cast<unsigned short>(strtoul(ui->global<guiGlobals>().get_device().data(), nullptr, HEX_BYTE));
 
-    aceFree(deviceNum);
     errorCode = bc.startBc(deviceNum);
+
+    slint::SharedString statusMessage = getStatus(errorCode).c_str();
+
     if (errorCode == 0) {
       ui->invoke_setConnectStatus(true);
     } else {
       ui->invoke_setConnectStatus(false);
-      ui->invoke_setError(getStatus(errorCode).c_str());
+      ui->invoke_setError(statusMessage);
     }
   });
 

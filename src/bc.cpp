@@ -47,6 +47,12 @@ S16BIT BC::startBc(S16BIT devNum) {
 
   m_devNum = devNum;
 
+  err = aceFree(m_devNum);
+
+  if (err != 0) {
+    return err;
+  }
+
   err = aceInitialize(m_devNum, ACE_ACCESS_CARD, ACE_MODE_BC, 0, 0, 0);
 
   if (err != 0) {

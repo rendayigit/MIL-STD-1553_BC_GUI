@@ -34,7 +34,12 @@ Logger::Logger(std::string logFilePath, int logBufferLimit)
   }
 }
 
-Logger::~Logger() { flush(); }
+Logger::~Logger() {
+  if (m_logFile.is_open()) {
+    m_logFile << m_logBuffer; // Write buffer to file writer
+    m_logFile.flush();        // Flush the file writer
+  }
+}
 
 void Logger::log(LogLevel level, const std::string &message) {
   std::lock_guard<std::mutex> lock(m_mutex); // Ensure thread-safe access
