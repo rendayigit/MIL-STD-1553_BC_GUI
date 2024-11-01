@@ -1,7 +1,7 @@
 #include "bc.hpp"
-#include "bc.h"
-#include "bcx.h"
 #include "common.hpp"
+#include "fileOperations/fileOperations.hpp"
+#include "json/json.hpp"
 #include <iostream>
 
 constexpr int MOD_FLAGS = 0x000F;
@@ -27,9 +27,17 @@ constexpr int MJR_FRAME_3 = 4;
 
 constexpr int MNR_FRAME_TIME = 1000;
 
-BC::BC() : m_messageBuffer(), m_devNum(0x0000) {
-  // TODO(renda): read config.json here
+const std::string CONFIG_PATH = FileOperations::getInstance().getExecutableDirectory() + "../config.json";
+
+BC::BC() : m_messageBuffer(), m_devNum(Json(CONFIG_PATH).getNode("DEFAULT_DEVICE_NUMBER").getValue<S16BIT>()) {
+  // TODO(renda): read config.json and set ui device number to m_devNum here
+  // TODO(renda): read config.json and set ui rt_rx, sa_rx, rt_tx, sa_tx here
+  // TODO(renda): read config.json and set ui wordcount here
+  // TODO(renda): read config.json and set ui bus selection here
+  // TODO(renda): read config.json and set ui bus controller mode here
+  // TODO(renda): read config.json and set ui data here
   // TODO(renda): add feature to read multiple configs with multiple data sets to periodically transmit
+  // TODO(renda): log everything
 }
 
 BC::~BC() { aceFree(m_devNum); }
@@ -228,7 +236,6 @@ S16BIT BC::rtToRt(int rtTx, int saTx, int rtRx, int saRx, int wc, U8BIT bus, boo
 
   stopBc();
 
-  // TODO(renda): rt_tr, rt_rc, sa_tr, sa_rc
   err = aceBCMsgModifyRTtoRT(m_devNum, MSG_RT_TO_RT_ID, DATA_BLK_RT_TO_RT_ID, rtRx, saRx, wc, rtTx, saTx, 0, bus,
                              MOD_FLAGS);
   if (err != 0) {
