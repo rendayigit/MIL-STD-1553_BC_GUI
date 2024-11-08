@@ -134,7 +134,7 @@ export component AppWindow inherits Window {
                             rt-text-1.text = "  RT Tx: ";
                             sa-text-1.text = "  SA Tx: ";
 
-                            rx-rt-sa-layout.opacity = 100%;
+                            rx-rt-sa-layout.visible = true;
                             root.height += 40px;
                             rx-rt-sa-layout.height = 40px;
                         } else {
@@ -143,7 +143,7 @@ export component AppWindow inherits Window {
 
                             root.height -= rx-rt-sa-layout.height;
                             rx-rt-sa-layout.height = 0px;
-                            rx-rt-sa-layout.opacity = 0%;
+                            rx-rt-sa-layout.visible = false;
                         }
                     }
                 }
@@ -255,9 +255,9 @@ export component AppWindow inherits Window {
             alignment: center;
             padding-left: 3px;
             height: 0px;
-            opacity: 0%;
+            visible: false;
 
-            animate height, opacity { duration: 300ms; }
+            animate height { duration: 300ms; }
 
             Text {
                 text: "RT Rx: ";

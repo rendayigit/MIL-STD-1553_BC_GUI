@@ -1,6 +1,7 @@
 #include "app-window.h"
 #include "bc.hpp"
 #include "common.hpp"
+#include <exception>
 #include <string>
 
 int main(int /*argc*/, char ** /*argv*/) {
@@ -56,13 +57,17 @@ int main(int /*argc*/, char ** /*argv*/) {
   });
 
   ui->on_browseConfig([&] {
-    char filename[1024];
-    FILE *f = popen("zenity --file-selection", "r");
-    fgets(filename, 1024, f);
-    ui->invoke_setConfigPath(filename);
+    try {
+      char filename[1024];
+      FILE *f = popen("zenity --file-selection", "r");
+      fgets(filename, 1024, f);
+      ui->invoke_setConfigPath(filename);
+    } catch (std::exception & /*e*/) {
+    }
   });
 
-  ui->on_startConfigRun([&](slint::SharedString configFile) { std::cout << "start " << configFile << std::endl; });
+  ui->on_startConfigRun(
+      [&](const slint::SharedString &configFile) { std::cout << "start " << configFile << std::endl; });
 
   ui->on_stopPressed([&] { bc.stopBc(); });
 
