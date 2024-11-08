@@ -2,24 +2,24 @@
   "Commands": [
     {
       "Bus": "A",
-      "RT_RX": 0,
-      "SA_RX": 0,
-      "RT_TX": 0,
-      "SA_TX": 0,
+      "RT_RX": 1,
+      "SA_RX": 2,
+      "RT_TX": 3,
+      "SA_TX": 4,
       "WORD_COUNT": 32,
       "BC_MODE": 2
     },
     {
       "Bus": "A",
-      "RT": 0,
-      "SA": 0,
+      "RT": 1,
+      "SA": 1,
       "WORD_COUNT": 32,
       "BC_MODE": 1
     },
     {
       "Bus": "A",
-      "RT": 0,
-      "SA": 0,
+      "RT": 2,
+      "SA": 2,
       "WORD_COUNT": 32,
       "BC_MODE": 0,
       "Data": [

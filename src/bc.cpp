@@ -303,36 +303,38 @@ void BC::configRun(const std::string &commandFilePath) {
 
   std::array<std::string, RT_SA_MAX_COUNT> data;
 
-  Json commands = Json(commandFilePath).getNode("Commands");
-
+  // Json commands = Json(path).getNode("Commands");
+  Json commands = Json("/home/t12023031214/renda/MIL-STD-1553_BC_GUI/commands.json").getNode("Commands");
+  
   for (int i = 0; i < commands.getSize(); i++) {
-    int wc = commands.getNode("WORD_COUNT").getValue<int>();
-    U8BIT bus = commands.getNode("Bus").getValue<std::string>() == "A" ? ACE_BCCTRL_CHL_A : ACE_BCCTRL_CHL_B;
+    Json command = commands.at(i);
+    int wc = command.getNode("WORD_COUNT").getValue<int>();
+    U8BIT bus = command.getNode("Bus").getValue<std::string>() == "A" ? ACE_BCCTRL_CHL_A : ACE_BCCTRL_CHL_B;
 
-    switch (commands.getNode("BC_MODE").getValue<int>()) {
+    switch (command.getNode("BC_MODE").getValue<int>()) {
     case 0:
-      rt = commands.getNode("RT").getValue<int>();
-      sa = commands.getNode("SA").getValue<int>();
+      rt = command.getNode("RT").getValue<int>();
+      sa = command.getNode("SA").getValue<int>();
 
       data.fill("");
 
-      for (int dataIndex = 0; dataIndex < commands.getNode("Data").getSize(); dataIndex++) {
-        data.at(dataIndex) = commands.getNode("Data").at(dataIndex).getValue<std::string>();
+      for (int dataIndex = 0; dataIndex < command.getNode("Data").getSize(); dataIndex++) {
+        data.at(dataIndex) = command.getNode("Data").at(dataIndex).getValue<std::string>();
       }
 
       bcToRt(rt, sa, wc, bus, data, false);
       break;
     case 1:
-      rt = commands.getNode("RT").getValue<int>();
-      sa = commands.getNode("SA").getValue<int>();
+      rt = command.getNode("RT").getValue<int>();
+      sa = command.getNode("SA").getValue<int>();
 
       rtToBc(rt, sa, wc, bus, false);
       break;
     case 2:
-      rtRx = commands.getNode("RT_RX").getValue<int>();
-      saRx = commands.getNode("SA_RX").getValue<int>();
-      rtTx = commands.getNode("RT_TX").getValue<int>();
-      saTx = commands.getNode("SA_TX").getValue<int>();
+      rtRx = command.getNode("RT_RX").getValue<int>();
+      saRx = command.getNode("SA_RX").getValue<int>();
+      rtTx = command.getNode("RT_TX").getValue<int>();
+      saTx = command.getNode("SA_TX").getValue<int>();
 
       rtToRt(rtTx, saTx, rtRx, saRx, wc, bus, false);
       break;

@@ -68,7 +68,10 @@ int main(int /*argc*/, char ** /*argv*/) {
   });
 
   ui->on_startConfigRun([&](const slint::SharedString &configFile) {
-    // TODO(renda): implement
+    std::string path = std::string(configFile);
+
+    // Remove newline characters
+    path.erase(std::remove(path.begin(), path.end(), '\n'), path.end());
 
     threadLoop = false;
 
@@ -78,7 +81,12 @@ int main(int /*argc*/, char ** /*argv*/) {
 
     try {
       threadLoop = true;
-      configRunnerThread = std::thread([&] { bc.configRun(std::string(configFile)); });
+      configRunnerThread = std::thread([&] {
+        while (threadLoop) {
+          bc.configRun(path);
+          std::this_thread::sleep_for(std::chrono::milliseconds(100));
+        }
+      });
     } catch (std::exception &e) {
       std::cout << e.what() << std::endl;
     }
