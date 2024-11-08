@@ -25,13 +25,16 @@ export component ConfigFileWindow inherits Window {
         padding-top: 50px;
 
         HorizontalLayout {
+            spacing: 5px;
+            
             Rectangle {
                 background: Palette.accent-background;
                 border-top-left-radius: 25px;
                 border-bottom-left-radius: 25px;
                 border-color: Palette.accent-background.darker(15%);
-                width: 400px;
+                width: 600px;
                 height: 45px;
+                clip: true;
 
                 configInput := TextInput {
                     vertical-alignment: center;
