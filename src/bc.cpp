@@ -3,6 +3,7 @@
 #include "fileOperations/fileOperations.hpp"
 #include "json/json.hpp"
 
+#include <array>
 #include <iostream>
 #include <string>
 
@@ -290,4 +291,53 @@ S16BIT BC::rtToRt(int rtTx, int saTx, int rtRx, int saRx, int wc, U8BIT bus, boo
   }
 
   return 0;
+}
+
+void BC::configRun(const std::string &commandFilePath) {
+  int rt = 0;
+  int sa = 0;
+  int rtRx = 0;
+  int saRx = 0;
+  int rtTx = 0;
+  int saTx = 0;
+
+  std::array<std::string, RT_SA_MAX_COUNT> data;
+
+  Json commands = Json(commandFilePath).getNode("Commands");
+
+  for (int i = 0; i < commands.getSize(); i++) {
+    int wc = commands.getNode("WORD_COUNT").getValue<int>();
+    U8BIT bus = commands.getNode("Bus").getValue<std::string>() == "A" ? ACE_BCCTRL_CHL_A : ACE_BCCTRL_CHL_B;
+
+    switch (commands.getNode("BC_MODE").getValue<int>()) {
+    case 0:
+      rt = commands.getNode("RT").getValue<int>();
+      sa = commands.getNode("SA").getValue<int>();
+
+      data.fill("");
+
+      for (int dataIndex = 0; dataIndex < commands.getNode("Data").getSize(); dataIndex++) {
+        data.at(dataIndex) = commands.getNode("Data").at(dataIndex).getValue<std::string>();
+      }
+
+      bcToRt(rt, sa, wc, bus, data, false);
+      break;
+    case 1:
+      rt = commands.getNode("RT").getValue<int>();
+      sa = commands.getNode("SA").getValue<int>();
+
+      rtToBc(rt, sa, wc, bus, false);
+      break;
+    case 2:
+      rtRx = commands.getNode("RT_RX").getValue<int>();
+      saRx = commands.getNode("SA_RX").getValue<int>();
+      rtTx = commands.getNode("RT_TX").getValue<int>();
+      saTx = commands.getNode("SA_TX").getValue<int>();
+
+      rtToRt(rtTx, saTx, rtRx, saRx, wc, bus, false);
+      break;
+    default:
+      break;
+    }
+  }
 }

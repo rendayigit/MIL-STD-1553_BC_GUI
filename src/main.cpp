@@ -3,12 +3,13 @@
 #include "common.hpp"
 #include <exception>
 #include <string>
+#include <thread>
 
 int main(int /*argc*/, char ** /*argv*/) {
   S16BIT errorCode = 0;
-
+  std::thread configRunnerThread;
+  bool threadLoop = false;
   auto ui = AppWindow::create();
-
   BC bc;
 
   ui->on_connectPressed([&] {
@@ -68,10 +69,30 @@ int main(int /*argc*/, char ** /*argv*/) {
 
   ui->on_startConfigRun([&](const slint::SharedString &configFile) {
     // TODO(renda): implement
+
+    threadLoop = false;
+
+    if (configRunnerThread.joinable()) {
+      configRunnerThread.join();
+    }
+
+    try {
+      threadLoop = true;
+      configRunnerThread = std::thread([&] { bc.configRun(std::string(configFile)); });
+    } catch (std::exception &e) {
+      std::cout << e.what() << std::endl;
+    }
+
     return true;
   });
 
   ui->on_stopPressed([&] {
+    threadLoop = false;
+
+    if (configRunnerThread.joinable()) {
+      configRunnerThread.join();
+    }
+
     errorCode = bc.stopBc();
 
     if (errorCode != 0) {
