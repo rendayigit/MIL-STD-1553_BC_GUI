@@ -73,7 +73,13 @@ int main(int /*argc*/, char ** /*argv*/) {
 
   ui->on_stopPressed([&] {
     errorCode = bc.stopBc();
-    ui->invoke_setError(getStatus(errorCode).c_str());
+
+    if (errorCode != 0) {
+      ui->invoke_setError(getStatus(errorCode).c_str());
+    } else {
+      ui->invoke_setConnectStatus(true);
+    }
+
     return errorCode == 0;
   });
 
