@@ -6,6 +6,14 @@ import { CustomButton } from "custom-button.slint";
 export component ConfigFileWindow inherits Window {
     in-out property <bool> isActive: false;
 
+    callback browseConfig;
+    callback startConfigRun(string);
+
+    callback setConfigPath(string);
+    setConfigPath(path) => {
+        configInput.text = path;
+    }
+
     visible: isActive;
     height: 0px;
 
@@ -22,7 +30,7 @@ export component ConfigFileWindow inherits Window {
                 width: 400px;
                 height: 50px;
 
-                TextInput {
+                configInput := TextInput {
                     vertical-alignment: center;
                     horizontal-alignment: center;
                     color: gray;
@@ -41,7 +49,7 @@ export component ConfigFileWindow inherits Window {
                 height: 50px;
 
                 onClick => {
-                    
+                    browseConfig();
                 }
             }
         }
@@ -60,7 +68,7 @@ export component ConfigFileWindow inherits Window {
                 height: 50px;
 
                 onClick => {
-                    
+                    startConfigRun(configInput.text);
                 }
             }
 

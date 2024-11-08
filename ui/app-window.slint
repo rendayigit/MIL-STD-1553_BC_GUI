@@ -26,6 +26,10 @@ export component AppWindow inherits Window {
     callback sendPressed(int);
     callback stopPressed();
 
+    callback browseConfig <=> config-file-window.browseConfig;
+    callback startConfigRun <=> config-file-window.startConfigRun;
+    callback setConfigPath <=> config-file-window.setConfigPath;
+
     public function setError(errorMsg: string) {
         errorText.color = Colors.red;
         errorText.text = errorMsg;

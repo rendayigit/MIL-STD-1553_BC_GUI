@@ -55,6 +55,15 @@ int main(int /*argc*/, char ** /*argv*/) {
     }
   });
 
+  ui->on_browseConfig([&] {
+    char filename[1024];
+    FILE *f = popen("zenity --file-selection", "r");
+    fgets(filename, 1024, f);
+    ui->invoke_setConfigPath(filename);
+  });
+
+  ui->on_startConfigRun([&](slint::SharedString configFile) { std::cout << "start " << configFile << std::endl; });
+
   ui->on_stopPressed([&] { bc.stopBc(); });
 
   ui->run();
