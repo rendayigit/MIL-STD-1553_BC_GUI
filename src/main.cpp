@@ -67,6 +67,7 @@ int main(int /*argc*/, char ** /*argv*/) {
       FILE *f = popen("zenity --file-selection", "r");
       fgets(filename, 1024, f);
       ui->invoke_setConfigPath(filename);
+      ui->invoke_setConnectStatus(true);
     } catch (std::exception &e) {
       ui->invoke_setError(e.what());
     }
@@ -78,6 +79,8 @@ int main(int /*argc*/, char ** /*argv*/) {
       return false;
     }
 
+    ui->invoke_setConnectStatus(true);
+
     threadDelay = Json(FileOperations::getInstance().getExecutableDirectory() + "../config.json")
                       .getNode("CONFIG_RUNNER_DELAY_BETWEEN_MESSAGES")
                       .getValue<int>();
@@ -86,6 +89,15 @@ int main(int /*argc*/, char ** /*argv*/) {
 
     // Remove newline characters
     path.erase(std::remove(path.begin(), path.end(), '\n'), path.end());
+
+    // test json file
+    try {
+      Json json(path);
+      json.getNode("Commands").at(0).getNode("BC_MODE").getValue<int>();
+    } catch (std::exception &e) {
+      ui->invoke_setError(e.what());
+      return false;
+    }
 
     bc.setCommandFilePath(path);
 
