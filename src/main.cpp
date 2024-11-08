@@ -68,10 +68,17 @@ int main(int /*argc*/, char ** /*argv*/) {
   });
 
   ui->on_startConfigRun([&](const slint::SharedString &configFile) {
+    if(configFile.empty()) {
+      ui->invoke_setError("Config file path error");
+      return false;
+    }
+
     std::string path = std::string(configFile);
 
     // Remove newline characters
     path.erase(std::remove(path.begin(), path.end(), '\n'), path.end());
+
+    bc.setCommandFilePath(path);
 
     threadLoop = false;
 
@@ -83,7 +90,7 @@ int main(int /*argc*/, char ** /*argv*/) {
       threadLoop = true;
       configRunnerThread = std::thread([&] {
         while (threadLoop) {
-          errorCode = bc.configRun(path);
+          errorCode = bc.configRun();
 
           if (errorCode != 0) {
             slint::invoke_from_event_loop([&] { ui->invoke_setError(getStatus(errorCode).c_str()); });

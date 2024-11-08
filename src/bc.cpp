@@ -293,7 +293,7 @@ S16BIT BC::rtToRt(int rtTx, int saTx, int rtRx, int saRx, int wc, U8BIT bus, boo
   return 0;
 }
 
-S16BIT BC::configRun(const std::string &commandFilePath) {
+S16BIT BC::configRun() {
   S16BIT err = 0;
   int rt = 0;
   int sa = 0;
@@ -304,8 +304,8 @@ S16BIT BC::configRun(const std::string &commandFilePath) {
 
   std::array<std::string, RT_SA_MAX_COUNT> data;
 
-  // Json commands = Json(path).getNode("Commands");
-  Json commands = Json("/home/t12023031214/renda/MIL-STD-1553_BC_GUI/commands.json").getNode("Commands");
+  Json commands = Json(m_commandFilePath).getNode("Commands");
+  // Json commands = Json("/home/t12023031214/renda/MIL-STD-1553_BC_GUI/commands.json").getNode("Commands");
 
   for (int i = 0; i < commands.getSize(); i++) {
     Json command = commands.at(i);
