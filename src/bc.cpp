@@ -293,7 +293,8 @@ S16BIT BC::rtToRt(int rtTx, int saTx, int rtRx, int saRx, int wc, U8BIT bus, boo
   return 0;
 }
 
-void BC::configRun(const std::string &commandFilePath) {
+S16BIT BC::configRun(const std::string &commandFilePath) {
+  S16BIT err = 0;
   int rt = 0;
   int sa = 0;
   int rtRx = 0;
@@ -305,7 +306,7 @@ void BC::configRun(const std::string &commandFilePath) {
 
   // Json commands = Json(path).getNode("Commands");
   Json commands = Json("/home/t12023031214/renda/MIL-STD-1553_BC_GUI/commands.json").getNode("Commands");
-  
+
   for (int i = 0; i < commands.getSize(); i++) {
     Json command = commands.at(i);
     int wc = command.getNode("WORD_COUNT").getValue<int>();
@@ -322,13 +323,21 @@ void BC::configRun(const std::string &commandFilePath) {
         data.at(dataIndex) = command.getNode("Data").at(dataIndex).getValue<std::string>();
       }
 
-      bcToRt(rt, sa, wc, bus, data, false);
+      err = bcToRt(rt, sa, wc, bus, data, false);
+      if (err != 0) {
+        return err;
+      }
+
       break;
     case 1:
       rt = command.getNode("RT").getValue<int>();
       sa = command.getNode("SA").getValue<int>();
 
-      rtToBc(rt, sa, wc, bus, false);
+      err = rtToBc(rt, sa, wc, bus, false);
+      if (err != 0) {
+        return err;
+      }
+
       break;
     case 2:
       rtRx = command.getNode("RT_RX").getValue<int>();
@@ -336,10 +345,16 @@ void BC::configRun(const std::string &commandFilePath) {
       rtTx = command.getNode("RT_TX").getValue<int>();
       saTx = command.getNode("SA_TX").getValue<int>();
 
-      rtToRt(rtTx, saTx, rtRx, saRx, wc, bus, false);
+      err = rtToRt(rtTx, saTx, rtRx, saRx, wc, bus, false);
+      if (err != 0) {
+        return err;
+      }
+
       break;
     default:
       break;
     }
   }
+
+  return 0;
 }

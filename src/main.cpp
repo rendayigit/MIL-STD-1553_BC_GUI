@@ -83,12 +83,22 @@ int main(int /*argc*/, char ** /*argv*/) {
       threadLoop = true;
       configRunnerThread = std::thread([&] {
         while (threadLoop) {
-          bc.configRun(path);
+          errorCode = bc.configRun(path);
+
+          if (errorCode != 0) {
+            slint::invoke_from_event_loop([&] { ui->invoke_setError(getStatus(errorCode).c_str()); });
+            threadLoop = false;
+            return false;
+          }
+
           std::this_thread::sleep_for(std::chrono::milliseconds(100));
         }
+
+        return true;
       });
     } catch (std::exception &e) {
       std::cout << e.what() << std::endl;
+      return false;
     }
 
     return true;
