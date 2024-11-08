@@ -1,0 +1,83 @@
+
+
+import { Button, Palette } from "std-widgets.slint";
+import { CustomButton } from "custom-button.slint";
+
+export component ConfigFileWindow inherits Window {
+    in-out property <bool> isActive: false;
+
+    visible: isActive;
+    height: 0px;
+
+    VerticalLayout {
+        spacing: 10px;
+        padding-top: 50px;
+
+        HorizontalLayout {
+            Rectangle {
+                background: Palette.accent-background;
+                border-top-left-radius: 25px;
+                border-bottom-left-radius: 25px;
+                border-color: Palette.accent-background.darker(15%);
+                width: 400px;
+                height: 50px;
+
+                TextInput {
+                    vertical-alignment: center;
+                    horizontal-alignment: center;
+                    color: gray;
+                    text: "Config File Path";
+                }
+            }
+
+            CustomButton {
+                text: "Browse";
+                defaultBackground: Palette.accent-background.darker(-10%);
+                hoveredBackground: Palette.accent-background.darker(20%);
+                clickedBackground: Palette.accent-background.darker(40%);
+                border-top-right-radius: 25px;
+                border-bottom-right-radius: 25px;
+                width: 100px;
+                height: 50px;
+
+                onClick => {
+                    
+                }
+            }
+        }
+
+        HorizontalLayout {
+            alignment: end;
+            spacing: 10px;
+
+            CustomButton {
+                text: "Start";
+                defaultBackground: Palette.accent-background;
+                hoveredBackground: Palette.accent-background.darker(20%);
+                clickedBackground: Palette.accent-background.darker(40%);
+                border-radius: 25px;
+                width: 100px;
+                height: 50px;
+
+                onClick => {
+                    
+                }
+            }
+
+            CustomButton {
+                text: "Cancel";
+                text-color: whitesmoke;
+                defaultBackground: red;
+                hoveredBackground: red.darker(20%);
+                clickedBackground: red.darker(40%);
+                border-radius: 25px;
+                width: 100px;
+                height: 50px;
+
+                onClick => {
+                    isActive = false;
+                }
+            }
+        }
+    }
+}

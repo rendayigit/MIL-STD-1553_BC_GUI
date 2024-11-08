@@ -1,6 +1,7 @@
 import { Button, CheckBox, ComboBox, TextEdit, Palette } from "std-widgets.slint";
 import { Rt-Sa-Wc-ComboBox } from "rt-sa-wc.slint";
 import { Word-Box } from "word-box.slint";
+import { ConfigFileWindow } from "config-file-window.slint";
 
 export global guiGlobals {
     in property <string> device;
@@ -78,6 +79,14 @@ export component AppWindow inherits Window {
                 padding: 15px;
                 spacing: 10px;
                 alignment: end;
+
+                Button {
+                    text: "Load from file";
+                    primary: true;
+                    clicked => {
+                        config-file-window.isActive = true;
+                    }
+                }
 
                 Rectangle {
                     background: guiGlobals.is-repeat && repeat-toggle-touch.has-hover ? Palette.accent-background.darker(30%) : // on and hover
@@ -187,8 +196,15 @@ export component AppWindow inherits Window {
         }
 
         HorizontalLayout {
+            alignment: center;
+
+            config-file-window := ConfigFileWindow { }
+        }
+
+        HorizontalLayout {
             padding: 15px;
             alignment: center;
+            visible: !config-file-window.isActive;
 
             Text {
                 text: "Bus: ";
@@ -261,6 +277,7 @@ export component AppWindow inherits Window {
         GridLayout {
             padding: 15px;
             spacing: 15px;
+            visible: !config-file-window.isActive;
 
             Text {
                 horizontal-alignment: left;
