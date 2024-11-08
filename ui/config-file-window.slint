@@ -7,12 +7,15 @@ export component ConfigFileWindow inherits Window {
     in-out property <bool> isActive: false;
 
     callback browseConfig;
-    callback startConfigRun(string);
+    callback startConfigRun(string) -> bool;
+    callback stopRun() -> bool;
 
     callback setConfigPath(string);
     setConfigPath(path) => {
         configInput.text = path;
     }
+
+    property <bool> isRunning: false;
 
     visible: isActive;
     height: 0px;
@@ -28,7 +31,7 @@ export component ConfigFileWindow inherits Window {
                 border-bottom-left-radius: 25px;
                 border-color: Palette.accent-background.darker(15%);
                 width: 400px;
-                height: 50px;
+                height: 45px;
 
                 configInput := TextInput {
                     vertical-alignment: center;
@@ -46,7 +49,7 @@ export component ConfigFileWindow inherits Window {
                 border-top-right-radius: 25px;
                 border-bottom-right-radius: 25px;
                 width: 100px;
-                height: 50px;
+                height: 45px;
 
                 onClick => {
                     browseConfig();
@@ -59,16 +62,20 @@ export component ConfigFileWindow inherits Window {
             spacing: 10px;
 
             CustomButton {
-                text: "Start";
+                text: isRunning ? "Stop" : "Run";
                 defaultBackground: Palette.accent-background;
                 hoveredBackground: Palette.accent-background.darker(20%);
                 clickedBackground: Palette.accent-background.darker(40%);
                 border-radius: 25px;
                 width: 100px;
-                height: 50px;
+                height: 45px;
 
                 onClick => {
-                    startConfigRun(configInput.text);
+                    if (isRunning) {
+                        isRunning = !stopRun();
+                    } else {
+                        isRunning = startConfigRun(configInput.text);
+                    }
                 }
             }
 
@@ -80,7 +87,7 @@ export component ConfigFileWindow inherits Window {
                 clickedBackground: red.darker(40%);
                 border-radius: 25px;
                 width: 100px;
-                height: 50px;
+                height: 45px;
 
                 onClick => {
                     isActive = false;

@@ -24,7 +24,7 @@ export component AppWindow inherits Window {
     property <int> commandType: 0; // Bc->RT: 0, RT->BC:1, RT->RT:2
     callback connectPressed();
     callback sendPressed(int);
-    callback stopPressed();
+    callback stopPressed <=> config-file-window.stopRun;
 
     callback browseConfig <=> config-file-window.browseConfig;
     callback startConfigRun <=> config-file-window.startConfigRun;
@@ -85,7 +85,7 @@ export component AppWindow inherits Window {
                 alignment: end;
 
                 Button {
-                    text: "Load from file";
+                    text: "Run from config";
                     primary: true;
                     clicked => {
                         config-file-window.isActive = true;

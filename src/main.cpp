@@ -66,10 +66,16 @@ int main(int /*argc*/, char ** /*argv*/) {
     }
   });
 
-  ui->on_startConfigRun(
-      [&](const slint::SharedString &configFile) { std::cout << "start " << configFile << std::endl; });
+  ui->on_startConfigRun([&](const slint::SharedString &configFile) {
+    // TODO(renda): implement
+    return true;
+  });
 
-  ui->on_stopPressed([&] { bc.stopBc(); });
+  ui->on_stopPressed([&] {
+    errorCode = bc.stopBc();
+    ui->invoke_setError(getStatus(errorCode).c_str());
+    return errorCode == 0;
+  });
 
   ui->run();
   return 0;
