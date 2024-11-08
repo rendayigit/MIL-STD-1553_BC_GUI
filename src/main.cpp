@@ -1,6 +1,9 @@
 #include "app-window.h"
 #include "bc.hpp"
 #include "common.hpp"
+#include "fileOperations/fileOperations.hpp"
+#include "json/json.hpp"
+
 #include <exception>
 #include <string>
 #include <thread>
@@ -63,15 +66,20 @@ int main(int /*argc*/, char ** /*argv*/) {
       FILE *f = popen("zenity --file-selection", "r");
       fgets(filename, 1024, f);
       ui->invoke_setConfigPath(filename);
-    } catch (std::exception & /*e*/) {
+    } catch (std::exception &e) {
+      ui->invoke_setError(e.what());
     }
   });
 
   ui->on_startConfigRun([&](const slint::SharedString &configFile) {
-    if(configFile.empty()) {
+    if (configFile.empty()) {
       ui->invoke_setError("Config file path error");
       return false;
     }
+
+    int threadDelay = Json(FileOperations::getInstance().getExecutableDirectory() + "../config.json")
+                          .getNode("CONFIG_RUNNER_DELAY_BETWEEN_MESSAGES")
+                          .getValue<int>();
 
     std::string path = std::string(configFile);
 
@@ -98,7 +106,7 @@ int main(int /*argc*/, char ** /*argv*/) {
             return false;
           }
 
-          std::this_thread::sleep_for(std::chrono::milliseconds(100));
+          std::this_thread::sleep_for(std::chrono::milliseconds(threadDelay));
         }
 
         return true;
