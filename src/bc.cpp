@@ -39,7 +39,7 @@ BC::BC() : m_messageBuffer(), m_devNum(Json(CONFIG_PATH).getNode("DEFAULT_DEVICE
   // TODO(renda): read config.json and set ui bus selection here
   // TODO(renda): read config.json and set ui bus controller mode here
   // TODO(renda): read config.json and set ui data here
-  // TODO(renda): add feature to read multiple configs with multiple data sets to periodically transmit
+  // TODO(renda): add error checks, ex) if the user selects an incorrect commands.json the app crashes :'(
 }
 
 BC::~BC() { aceFree(m_devNum); }
