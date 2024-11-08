@@ -13,6 +13,7 @@ int main(int /*argc*/, char ** /*argv*/) {
   std::thread configRunnerThread;
   bool threadLoop = false;
   auto ui = AppWindow::create();
+  int threadDelay = 0;
   BC bc;
 
   ui->on_connectPressed([&] {
@@ -77,9 +78,9 @@ int main(int /*argc*/, char ** /*argv*/) {
       return false;
     }
 
-    int threadDelay = Json(FileOperations::getInstance().getExecutableDirectory() + "../config.json")
-                          .getNode("CONFIG_RUNNER_DELAY_BETWEEN_MESSAGES")
-                          .getValue<int>();
+    threadDelay = Json(FileOperations::getInstance().getExecutableDirectory() + "../config.json")
+                      .getNode("CONFIG_RUNNER_DELAY_BETWEEN_MESSAGES")
+                      .getValue<int>();
 
     std::string path = std::string(configFile);
 
