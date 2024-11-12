@@ -8,6 +8,8 @@
 #include <string>
 #include <thread>
 
+constexpr int MAX_FILE_PATH_SIZE = 1024;
+
 int main(int /*argc*/, char ** /*argv*/) {
   S16BIT errorCode = 0;
   std::thread configRunnerThread;
@@ -15,6 +17,25 @@ int main(int /*argc*/, char ** /*argv*/) {
   auto ui = AppWindow::create();
   int threadDelay = 0;
   BC bc;
+
+  ui->global<guiGlobals>().set_device(bc.getConfigData().getDeviceNum().c_str());
+  ui->global<guiGlobals>().set_bus(bc.getConfigData().getBus().c_str());
+  ui->global<guiGlobals>().set_rt_rx(bc.getConfigData().getRtRx());
+  ui->global<guiGlobals>().set_rt(bc.getConfigData().getRtTx());
+  ui->global<guiGlobals>().set_sa_rx(bc.getConfigData().getSaRx());
+  ui->global<guiGlobals>().set_sa(bc.getConfigData().getSaTx());
+  ui->global<guiGlobals>().set_wc(bc.getConfigData().getWc());
+  ui->global<guiGlobals>().set_bcMode(bc.getConfigData().getBcMode());
+
+  auto dataArray = std::make_shared<slint::VectorModel<slint::SharedString>>();
+
+  for (int i = 0; i < bc.getConfigData().getData().size(); ++i) {
+    dataArray->push_back(bc.getConfigData().getData().at(i).c_str());
+  }
+
+  ui->global<guiGlobals>().set_words(dataArray);
+
+  ui->invoke_setUiFromConfig();
 
   ui->on_connectPressed([&] {
     U8BIT deviceNum =
@@ -63,9 +84,10 @@ int main(int /*argc*/, char ** /*argv*/) {
 
   ui->on_browseConfig([&] {
     try {
-      char filename[1024];
-      FILE *f = popen("zenity --file-selection", "r");
-      fgets(filename, 1024, f);
+      char filename[MAX_FILE_PATH_SIZE];               // NOLINT(hicpp-avoid-c-arrays, modernize-avoid-c-arrays,
+                                                       // cppcoreguidelines-avoid-c-arrays)
+      FILE *f = popen("zenity --file-selection", "r"); // NOLINT (cert-env33-c)
+      fgets(filename, MAX_FILE_PATH_SIZE, f);          // NOLINT (cert-err33-c)
       ui->invoke_setConfigPath(filename);
       ui->invoke_setConnectStatus(true);
     } catch (std::exception &e) {

@@ -1,5 +1,6 @@
 #include "bc.hpp"
 #include "common.hpp"
+#include "configData.hpp"
 #include "fileOperations/fileOperations.hpp"
 #include "json/json.hpp"
 
@@ -33,12 +34,20 @@ constexpr int MNR_FRAME_TIME = 1000;
 const std::string CONFIG_PATH = FileOperations::getInstance().getExecutableDirectory() + "../config.json";
 
 BC::BC() : m_messageBuffer(), m_devNum(Json(CONFIG_PATH).getNode("DEFAULT_DEVICE_NUMBER").getValue<S16BIT>()) {
-  // TODO(renda): read config.json and set ui device number to m_devNum here
-  // TODO(renda): read config.json and set ui rt_rx, sa_rx, rt_tx, sa_tx here
-  // TODO(renda): read config.json and set ui wordcount here
-  // TODO(renda): read config.json and set ui bus selection here
-  // TODO(renda): read config.json and set ui bus controller mode here
-  // TODO(renda): read config.json and set ui data here
+  std::array<std::string, RT_SA_MAX_COUNT> dataArray;
+
+  for (int i = 0; i < RT_SA_MAX_COUNT; i++) {
+    dataArray.at(i) = Json(CONFIG_PATH).getNode("UI_DEFAULT_Data").at(i).getValue<std::string>();
+  }
+
+  m_configData =
+      new ConfigData(std::to_string(m_devNum), Json(CONFIG_PATH).getNode("UI_DEFAULT_BUS").getValue<std::string>(),
+                     Json(CONFIG_PATH).getNode("UI_DEFAULT_RT_RX").getValue<int>(),
+                     Json(CONFIG_PATH).getNode("UI_DEFAULT_SA_RX").getValue<int>(),
+                     Json(CONFIG_PATH).getNode("UI_DEFAULT_RT_TX").getValue<int>(),
+                     Json(CONFIG_PATH).getNode("UI_DEFAULT_SA_TX").getValue<int>(),
+                     Json(CONFIG_PATH).getNode("UI_DEFAULT_WORD_COUNT").getValue<int>(),
+                     Json(CONFIG_PATH).getNode("UI_DEFAULT_BC_MODE").getValue<int>(), dataArray);
 }
 
 BC::~BC() { aceFree(m_devNum); }

@@ -13,6 +13,7 @@ export global guiGlobals {
     in property <int> wc;
     in property <string> bus;
     in property <[string]> words;
+    in property <int> bcMode; // Bc->RT: 0, RT->BC:1, RT->RT:2
 }
 
 export component AppWindow inherits Window {
@@ -21,7 +22,6 @@ export component AppWindow inherits Window {
     min-width: 800px;
     min-height: 400px;
 
-    property <int> commandType: 0; // Bc->RT: 0, RT->BC:1, RT->RT:2
     callback connectPressed();
     callback sendPressed(int);
     callback stopPressed <=> config-file-window.stopRun;
@@ -45,6 +45,73 @@ export component AppWindow inherits Window {
             // Failure status message set by setError
             sendButton.enabled = false;
             runConfigButton.enabled = false;
+        }
+    }
+
+    public function setUiFromConfig() {
+        device-box.text = guiGlobals.device;
+
+        busComboBox.current-value = guiGlobals.bus;
+        rt-ComboBox.current-value = guiGlobals.rt;
+        sa-ComboBox.current-value = guiGlobals.sa;
+        wc-ComboBox.current-value = guiGlobals.wc;
+        rt-ComboBox-2.current-value = guiGlobals.rt-rx;
+        sa-ComboBox-2.current-value = guiGlobals.sa-rx;
+
+        bcModeCombo.current-index = guiGlobals.bcMode; // FIXME: bug if index is 2
+        busModeComboHandler();
+
+        word0.text = guiGlobals.words[0];
+        word1.text = guiGlobals.words[1];
+        word2.text = guiGlobals.words[2];
+        word3.text = guiGlobals.words[3];
+        word4.text = guiGlobals.words[4];
+        word5.text = guiGlobals.words[5];
+        word6.text = guiGlobals.words[6];
+        word7.text = guiGlobals.words[7];
+        word8.text = guiGlobals.words[8];
+        word9.text = guiGlobals.words[9];
+        word10.text = guiGlobals.words[10];
+        word11.text = guiGlobals.words[11];
+        word12.text = guiGlobals.words[12];
+        word13.text = guiGlobals.words[13];
+        word14.text = guiGlobals.words[14];
+        word15.text = guiGlobals.words[15];
+        word16.text = guiGlobals.words[16];
+        word17.text = guiGlobals.words[17];
+        word18.text = guiGlobals.words[18];
+        word19.text = guiGlobals.words[19];
+        word20.text = guiGlobals.words[20];
+        word21.text = guiGlobals.words[21];
+        word22.text = guiGlobals.words[22];
+        word23.text = guiGlobals.words[23];
+        word24.text = guiGlobals.words[24];
+        word25.text = guiGlobals.words[25];
+        word26.text = guiGlobals.words[26];
+        word27.text = guiGlobals.words[27];
+        word28.text = guiGlobals.words[28];
+        word29.text = guiGlobals.words[29];
+        word30.text = guiGlobals.words[30];
+        word31.text = guiGlobals.words[31];
+    }
+
+    function busModeComboHandler() {
+        guiGlobals.bcMode = bcModeCombo.current-index;
+
+        if (bcModeCombo.current-index == 2) {
+            rt-text-1.text = "  RT Tx: ";
+            sa-text-1.text = "  SA Tx: ";
+
+            rx-rt-sa-layout.visible = true;
+            root.height += 40px;
+            rx-rt-sa-layout.height = 40px;
+        } else {
+            rt-text-1.text = "  RT: ";
+            sa-text-1.text = "  SA: ";
+
+            root.height -= rx-rt-sa-layout.height;
+            rx-rt-sa-layout.height = 0px;
+            rx-rt-sa-layout.visible = false;
         }
     }
 
@@ -126,28 +193,12 @@ export component AppWindow inherits Window {
                     }
                 }
 
-                ComboBox {
+                bcModeCombo := ComboBox {
                     current-value: "BC → RT";
                     width: 125px;
                     model: ["BC → RT", "RT → BC", "RT → RT"];
                     selected => {
-                        commandType = self.current-index;
-
-                        if (self.current-value == "RT → RT") {
-                            rt-text-1.text = "  RT Tx: ";
-                            sa-text-1.text = "  SA Tx: ";
-
-                            rx-rt-sa-layout.visible = true;
-                            root.height += 40px;
-                            rx-rt-sa-layout.height = 40px;
-                        } else {
-                            rt-text-1.text = "  RT: ";
-                            sa-text-1.text = "  SA: ";
-
-                            root.height -= rx-rt-sa-layout.height;
-                            rx-rt-sa-layout.height = 0px;
-                            rx-rt-sa-layout.visible = false;
-                        }
+                        busModeComboHandler();
                     }
                 }
 
@@ -196,7 +247,7 @@ export component AppWindow inherits Window {
                             "0x" + word30.text,
                             "0x" + word31.text
                         ];
-                        sendPressed(commandType);
+                        sendPressed(guiGlobals.bcMode);
                     }
                 }
             }

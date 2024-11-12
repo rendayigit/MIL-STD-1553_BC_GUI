@@ -2,6 +2,7 @@
 #define BC_HPP
 
 #include "common.hpp"
+#include "configData.hpp"
 #include "stdemace.h"
 #include <array>
 #include <string>
@@ -10,6 +11,8 @@ class BC {
 public:
   BC();
   ~BC();
+
+  ConfigData getConfigData() const { return *m_configData; }
 
   S16BIT startBc(S16BIT devNum);
   S16BIT stopBc();
@@ -21,6 +24,7 @@ public:
   void setCommandFilePath(const std::string &commandFilePath) { m_commandFilePath = commandFilePath; }
 
 private:
+  ConfigData *m_configData;
   U16BIT m_messageBuffer[RT_SA_MAX_COUNT]; // NOLINT(hicpp-avoid-c-arrays, modernize-avoid-c-arrays,
                                            // cppcoreguidelines-avoid-c-arrays)
   std::string m_commandFilePath;
