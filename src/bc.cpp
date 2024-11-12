@@ -1,8 +1,10 @@
 #include "bc.hpp"
 #include "common.hpp"
+#include "configData.hpp"
 #include "fileOperations/fileOperations.hpp"
 #include "json/json.hpp"
 
+#include <array>
 #include <iostream>
 #include <string>
 
@@ -32,13 +34,20 @@ constexpr int MNR_FRAME_TIME = 1000;
 const std::string CONFIG_PATH = FileOperations::getInstance().getExecutableDirectory() + "../config.json";
 
 BC::BC() : m_messageBuffer(), m_devNum(Json(CONFIG_PATH).getNode("DEFAULT_DEVICE_NUMBER").getValue<S16BIT>()) {
-  // TODO(renda): read config.json and set ui device number to m_devNum here
-  // TODO(renda): read config.json and set ui rt_rx, sa_rx, rt_tx, sa_tx here
-  // TODO(renda): read config.json and set ui wordcount here
-  // TODO(renda): read config.json and set ui bus selection here
-  // TODO(renda): read config.json and set ui bus controller mode here
-  // TODO(renda): read config.json and set ui data here
-  // TODO(renda): add feature to read multiple configs with multiple data sets to periodically transmit
+  std::array<std::string, RT_SA_MAX_COUNT> dataArray;
+
+  for (int i = 0; i < RT_SA_MAX_COUNT; i++) {
+    dataArray.at(i) = Json(CONFIG_PATH).getNode("UI_DEFAULT_Data").at(i).getValue<std::string>();
+  }
+
+  m_configData =
+      new ConfigData(std::to_string(m_devNum), Json(CONFIG_PATH).getNode("UI_DEFAULT_BUS").getValue<std::string>(),
+                     Json(CONFIG_PATH).getNode("UI_DEFAULT_RT_RX").getValue<int>(),
+                     Json(CONFIG_PATH).getNode("UI_DEFAULT_SA_RX").getValue<int>(),
+                     Json(CONFIG_PATH).getNode("UI_DEFAULT_RT_TX").getValue<int>(),
+                     Json(CONFIG_PATH).getNode("UI_DEFAULT_SA_TX").getValue<int>(),
+                     Json(CONFIG_PATH).getNode("UI_DEFAULT_WORD_COUNT").getValue<int>(),
+                     Json(CONFIG_PATH).getNode("UI_DEFAULT_BC_MODE").getValue<int>(), dataArray);
 }
 
 BC::~BC() { aceFree(m_devNum); }
@@ -287,6 +296,72 @@ S16BIT BC::rtToRt(int rtTx, int saTx, int rtRx, int saRx, int wc, U8BIT bus, boo
   err = aceBCStart(m_devNum, MJR_FRAME_3, repeatCount);
   if (err != 0) {
     return err;
+  }
+
+  return 0;
+}
+
+S16BIT BC::configRun() {
+  S16BIT err = 0;
+  int rt = 0;
+  int sa = 0;
+  int rtRx = 0;
+  int saRx = 0;
+  int rtTx = 0;
+  int saTx = 0;
+
+  std::array<std::string, RT_SA_MAX_COUNT> data;
+
+  Json commands = Json(m_commandFilePath).getNode("Commands");
+  // Json commands = Json("/home/t12023031214/renda/MIL-STD-1553_BC_GUI/commands.json").getNode("Commands");
+
+  for (int i = 0; i < commands.getSize(); i++) {
+    Json command = commands.at(i);
+    int wc = command.getNode("WORD_COUNT").getValue<int>();
+    U8BIT bus = command.getNode("Bus").getValue<std::string>() == "A" ? ACE_BCCTRL_CHL_A : ACE_BCCTRL_CHL_B;
+
+    switch (command.getNode("BC_MODE").getValue<int>()) {
+    case 0:
+      rt = command.getNode("RT").getValue<int>();
+      sa = command.getNode("SA").getValue<int>();
+
+      data.fill("");
+
+      for (int dataIndex = 0; dataIndex < command.getNode("Data").getSize(); dataIndex++) {
+        data.at(dataIndex) = command.getNode("Data").at(dataIndex).getValue<std::string>();
+      }
+
+      err = bcToRt(rt, sa, wc, bus, data, false);
+      if (err != 0) {
+        return err;
+      }
+
+      break;
+    case 1:
+      rt = command.getNode("RT").getValue<int>();
+      sa = command.getNode("SA").getValue<int>();
+
+      err = rtToBc(rt, sa, wc, bus, false);
+      if (err != 0) {
+        return err;
+      }
+
+      break;
+    case 2:
+      rtRx = command.getNode("RT_RX").getValue<int>();
+      saRx = command.getNode("SA_RX").getValue<int>();
+      rtTx = command.getNode("RT_TX").getValue<int>();
+      saTx = command.getNode("SA_TX").getValue<int>();
+
+      err = rtToRt(rtTx, saTx, rtRx, saRx, wc, bus, false);
+      if (err != 0) {
+        return err;
+      }
+
+      break;
+    default:
+      break;
+    }
   }
 
   return 0;

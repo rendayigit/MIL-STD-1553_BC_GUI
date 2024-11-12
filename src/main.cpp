@@ -1,14 +1,41 @@
 #include "app-window.h"
 #include "bc.hpp"
 #include "common.hpp"
+#include "fileOperations/fileOperations.hpp"
+#include "json/json.hpp"
+
+#include <exception>
 #include <string>
+#include <thread>
+
+constexpr int MAX_FILE_PATH_SIZE = 1024;
 
 int main(int /*argc*/, char ** /*argv*/) {
   S16BIT errorCode = 0;
-
+  std::thread configRunnerThread;
+  bool threadLoop = false;
   auto ui = AppWindow::create();
-
+  int threadDelay = 0;
   BC bc;
+
+  ui->global<guiGlobals>().set_device(bc.getConfigData().getDeviceNum().c_str());
+  ui->global<guiGlobals>().set_bus(bc.getConfigData().getBus().c_str());
+  ui->global<guiGlobals>().set_rt_rx(bc.getConfigData().getRtRx());
+  ui->global<guiGlobals>().set_rt(bc.getConfigData().getRtTx());
+  ui->global<guiGlobals>().set_sa_rx(bc.getConfigData().getSaRx());
+  ui->global<guiGlobals>().set_sa(bc.getConfigData().getSaTx());
+  ui->global<guiGlobals>().set_wc(bc.getConfigData().getWc());
+  ui->global<guiGlobals>().set_bcMode(bc.getConfigData().getBcMode());
+
+  auto dataArray = std::make_shared<slint::VectorModel<slint::SharedString>>();
+
+  for (int i = 0; i < bc.getConfigData().getData().size(); ++i) {
+    dataArray->push_back(bc.getConfigData().getData().at(i).c_str());
+  }
+
+  ui->global<guiGlobals>().set_words(dataArray);
+
+  ui->invoke_setUiFromConfig();
 
   ui->on_connectPressed([&] {
     U8BIT deviceNum =
@@ -55,7 +82,95 @@ int main(int /*argc*/, char ** /*argv*/) {
     }
   });
 
-  ui->on_stopPressed([&] { bc.stopBc(); });
+  ui->on_browseConfig([&] {
+    try {
+      char filename[MAX_FILE_PATH_SIZE];               // NOLINT(hicpp-avoid-c-arrays, modernize-avoid-c-arrays,
+                                                       // cppcoreguidelines-avoid-c-arrays)
+      FILE *f = popen("zenity --file-selection", "r"); // NOLINT (cert-env33-c)
+      fgets(filename, MAX_FILE_PATH_SIZE, f);          // NOLINT (cert-err33-c)
+      ui->invoke_setConfigPath(filename);
+      ui->invoke_setConnectStatus(true);
+    } catch (std::exception &e) {
+      ui->invoke_setError(e.what());
+    }
+  });
+
+  ui->on_startConfigRun([&](const slint::SharedString &configFile) {
+    if (configFile.empty()) {
+      ui->invoke_setError("Config file path error");
+      return false;
+    }
+
+    ui->invoke_setConnectStatus(true);
+
+    threadDelay = Json(FileOperations::getInstance().getExecutableDirectory() + "../config.json")
+                      .getNode("CONFIG_RUNNER_DELAY_BETWEEN_MESSAGES")
+                      .getValue<int>();
+
+    std::string path = std::string(configFile);
+
+    // Remove newline characters
+    path.erase(std::remove(path.begin(), path.end(), '\n'), path.end());
+
+    // test json file
+    try {
+      Json json(path);
+      json.getNode("Commands").at(0).getNode("BC_MODE").getValue<int>();
+    } catch (std::exception &e) {
+      ui->invoke_setError(e.what());
+      return false;
+    }
+
+    bc.setCommandFilePath(path);
+
+    threadLoop = false;
+
+    if (configRunnerThread.joinable()) {
+      configRunnerThread.join();
+    }
+
+    try {
+      threadLoop = true;
+      configRunnerThread = std::thread([&] {
+        while (threadLoop) {
+          errorCode = bc.configRun();
+
+          if (errorCode != 0) {
+            slint::invoke_from_event_loop([&] { ui->invoke_setError(getStatus(errorCode).c_str()); });
+            threadLoop = false;
+            return false;
+          }
+
+          std::this_thread::sleep_for(std::chrono::milliseconds(threadDelay));
+        }
+
+        return true;
+      });
+    } catch (std::exception &e) {
+      std::cout << e.what() << std::endl;
+      return false;
+    }
+
+    return true;
+  });
+
+  ui->on_stopPressed([&] {
+    threadLoop = false;
+
+    if (configRunnerThread.joinable()) {
+      configRunnerThread.join();
+    }
+
+    errorCode = bc.stopBc();
+
+    if (errorCode != 0) {
+      ui->invoke_setError(getStatus(errorCode).c_str());
+    } else {
+      ui->invoke_setConnectStatus(true);
+    }
+
+    return errorCode == 0;
+  });
 
   ui->run();
   return 0;

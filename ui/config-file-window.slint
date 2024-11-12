@@ -1,0 +1,98 @@
+import { Button, Palette } from "std-widgets.slint";
+import { CustomButton } from "custom-button.slint";
+
+export component ConfigFileWindow inherits Window {
+    in-out property <bool> isActive: false;
+
+    callback browseConfig;
+    callback startConfigRun(string) -> bool;
+    callback stopRun() -> bool;
+
+    callback setConfigPath(string);
+    setConfigPath(path) => {
+        configInput.text = path;
+    }
+
+    property <bool> isRunning: false;
+
+    visible: isActive;
+    height: 0px;
+
+    VerticalLayout {
+        spacing: 10px;
+        padding-top: 50px;
+
+        HorizontalLayout {
+            spacing: 5px;
+            Rectangle {
+                background: Palette.accent-background;
+                border-top-left-radius: 25px;
+                border-bottom-left-radius: 25px;
+                border-color: Palette.accent-background.darker(15%);
+                width: 600px;
+                height: 45px;
+                clip: true;
+
+                configInput := TextInput {
+                    vertical-alignment: center;
+                    horizontal-alignment: center;
+                    color: gray;
+                    text: "../commands.json";
+                }
+            }
+
+            CustomButton {
+                text: "Browse";
+                defaultBackground: Palette.accent-background.darker(-10%);
+                hoveredBackground: Palette.accent-background.darker(20%);
+                clickedBackground: Palette.accent-background.darker(40%);
+                border-top-right-radius: 25px;
+                border-bottom-right-radius: 25px;
+                width: 100px;
+                height: 45px;
+
+                onClick => {
+                    browseConfig();
+                }
+            }
+        }
+
+        HorizontalLayout {
+            alignment: end;
+            spacing: 10px;
+
+            CustomButton {
+                text: isRunning ? "Stop" : "Run";
+                defaultBackground: Palette.accent-background;
+                hoveredBackground: Palette.accent-background.darker(20%);
+                clickedBackground: Palette.accent-background.darker(40%);
+                border-radius: 25px;
+                width: 100px;
+                height: 45px;
+
+                onClick => {
+                    if (isRunning) {
+                        isRunning = !stopRun();
+                    } else {
+                        isRunning = startConfigRun(configInput.text);
+                    }
+                }
+            }
+
+            CustomButton {
+                text: "Cancel";
+                text-color: whitesmoke;
+                defaultBackground: red;
+                hoveredBackground: red.darker(20%);
+                clickedBackground: red.darker(40%);
+                border-radius: 25px;
+                width: 100px;
+                height: 45px;
+
+                onClick => {
+                    isActive = false;
+                }
+            }
+        }
+    }
+}

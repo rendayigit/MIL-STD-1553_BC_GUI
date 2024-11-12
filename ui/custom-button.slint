@@ -1,0 +1,21 @@
+export component CustomButton inherits Rectangle {
+    callback onClick <=> touchArea.clicked;
+    in property <string> text: "Button";
+    in property <color> text-color: black;
+    in property <color> defaultBackground: gray;
+    in property <color> hoveredBackground: gray.darker(20%);
+    in property <color> clickedBackground: gray.darker(40%);
+
+    background: touchArea.pressed ? clickedBackground : touchArea.has-hover ? hoveredBackground : defaultBackground;
+
+    animate background { duration: 150ms; }
+
+    Text {
+        vertical-alignment: center;
+        horizontal-alignment: center;
+        color: parent.text-color;
+        text: parent.text;
+    }
+
+    touchArea := TouchArea { }
+}
