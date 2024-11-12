@@ -158,6 +158,8 @@ export component AppWindow inherits Window {
                     primary: true;
                     enabled: false;
                     clicked => {
+                        bcModeCombo.current-index = 0;
+                        busModeComboHandler();
                         config-file-window.isActive = true;
                     }
                 }
