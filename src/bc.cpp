@@ -313,7 +313,6 @@ S16BIT BC::configRun() {
   std::array<std::string, RT_SA_MAX_COUNT> data;
 
   Json commands = Json(m_commandFilePath).getNode("Commands");
-  // Json commands = Json("/home/t12023031214/renda/MIL-STD-1553_BC_GUI/commands.json").getNode("Commands");
 
   for (int i = 0; i < commands.getSize(); i++) {
     Json command = commands.at(i);
