@@ -7,6 +7,7 @@
 
 1. Run `sudo apt install build-essential`
 1. Run `sudo apt install cmake`
+1. Run `sudo apt install libqt5gui5`
 1. Clone the project
 1. Run `./scripts/build.sh`
 1. Run `./scripts/run.sh`
